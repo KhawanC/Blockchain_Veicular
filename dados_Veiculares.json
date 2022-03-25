@@ -1,0 +1,41 @@
+[{
+    "Veiculo":[{
+        "categoria": "Médio",
+        "marca": "Renault",
+        "versão": "Logan",
+        "modelo": "Zen",
+        "emissao": 107,
+        "codigo": "MRNTLOZ107"  
+    },
+    {
+        "categoria": "Compacto",
+        "marca": "VW",
+        "versão": "GOL",
+        "modelo": "PATRULHEIRO",
+        "emissao": 112,
+        "codigo": "CVKWGOP112"  
+    },
+    {
+        "categoria": "Médio",
+        "marca": "Honda",
+        "versão": "City",
+        "modelo": "EX",
+        "emissao": 101,
+        "codigo": "MHNDCIE101"  
+    },{
+        "categoria": "Médio",
+        "marca": "Toyota",
+        "versão": "ETIUS SEDÃ",
+        "modelo": "XSTD",
+        "emissao": 98,
+        "codigo": "MTYTESX098"  
+    },
+    {
+        "categoria": "Compacto",
+        "marca": "Hyundai",
+        "versão": "HB20",
+        "modelo": "Vision21/22",
+        "emissao": 97,
+        "codigo": "CHYDHBV097"  
+    }]
+}]
