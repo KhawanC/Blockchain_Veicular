@@ -1,0 +1,41 @@
+{
+	"Veiculo_Compacto": [{
+			"Marca": "VW",
+			"Versão": "GOL",
+			"Modelo": "PATRULHEIRO",
+			"Emissão": 112
+		},
+		{
+			"Marca": "Hyundai",
+			"Versão": "HB20",
+			"Modelo": "Vision21/22",
+			"Emissão": 97
+		},
+		{
+			"Marca": "Toyota",
+			"Versão": "Etios Hatback",
+			"Modelo": "XSTD",
+			"Emissão": 100
+		}
+	],
+	"Veiculo_Medio": [{
+			"Marca": "Renault",
+			"Versão": "Logan",
+			"Modelo": "Zen",
+			"Emissão": 107
+
+		},
+		{
+			"Marca": "Honda",
+			"Versão": "City",
+			"Modelo": "EX",
+			"Emissão": 101
+		},
+		{
+			"Marca": "Toyota",
+			"Versão": "Etius Sedã",
+			"Modelo": "XSTD",
+			"Emissão": 98
+		}
+	]
+}
