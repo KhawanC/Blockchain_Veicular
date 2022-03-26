@@ -50,7 +50,6 @@ class Json:
             f.write(msg)
 
 veiculos_json = Json.ler_json('dadosVeiculares.json')
-sigma = 10
 qst = ["categoria", "marca"] 
 user_temp = []
 user_fnl = {}
