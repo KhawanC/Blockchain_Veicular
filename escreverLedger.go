@@ -56,11 +56,32 @@ func main() {
 
 	var informacoes_tabela Veiculo
 	var informacoes_token Veiculo_Cif
+	var ledger_map Veiculo
 
 	json.Unmarshal(tabelaAsBytes, &informacoes_tabela)
 	json.Unmarshal(tokenAsBytes, &informacoes_token)
+	//CONTINUAR DPS
+	//fmt.Println("Digite ")
+	//arg1 := os.Args[0]
 
-	fmt.Println(informacoes_tabela.Veiculo_Compacto[1].Codigo)
+	if informacoes_token.Categoria == "Veiculo_Medio" {
+		for i := 0; i <= len(informacoes_tabela.Veiculo_Medio)-1; i++ {
+			if informacoes_token.Codigo == informacoes_tabela.Veiculo_Medio[i].Codigo {
+				ledger_map = informacoes_tabela.Veiculo_Medio[i]
+				fmt.Println(ledger_map)
+			}
+		}
+	}
+	if informacoes_token.Categoria == "Veiculo_Compacto" {
+		for i := 0; i <= len(informacoes_tabela.Veiculo_Compacto)-1; i++ {
+			if informacoes_token.Codigo == informacoes_tabela.Veiculo_Compacto[i].Codigo {
+				ledger_map = informacoes_tabela.Veiculo_Compacto[i]
+				fmt.Println(ledger_map)
+			}
+		}
+	}
+	fmt.Println("-------------------------------")
+	fmt.Println(informacoes_tabela.Veiculo_Medio[0].Codigo)
 	fmt.Println("-------------------------------")
 	fmt.Println(informacoes_token.Codigo)
 
