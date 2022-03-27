@@ -1,9 +1,11 @@
 from random import gauss
 from time import sleep
+from unittest import skip
 import numpy as np, json
-import math, rsa
+#import math, rsa
 
-class Criptografia(object):
+#FUNÇÕES PARA CRIPTOGRAFIA RSA, TALVEZ EU USE
+"""class Criptografia(object):
     ''' FUNÇÕES DE CRIPTOGRAFIA RSA
     
 As próximas linhas são destinadas a criar um par de chaves para criptogravar o arquivo json ao final do código'''
@@ -40,33 +42,31 @@ As próximas linhas são destinadas a criar um par de chaves para criptogravar o
         try:
             return rsa.verify(msg.encode('ascii'), signature, key) == 'SHA-1'
         except:
-            return False
-class Json:
+            return False"""
+class Json_manipular:
     def ler_json(arq_json):
         with open(arq_json, 'r', encoding='utf-8') as f:
             return json.load(f)
     def criar_json(msg):
-        with open('TOKEN.json', 'wb') as f:
+        with open('TOKEN.JSON', 'w') as f:
             f.write(msg)
 
-veiculos_json = Json.ler_json('dadosVeiculares.json')
+veiculos_json = Json_manipular.ler_json('dadosVeiculares.json')
 qst = ["categoria", "marca"] 
 user_temp = []
-user_fnl = {}
+user_fnl = {}   
+codigo = {}
 chave = list(veiculos_json.keys())
 
 #Ler placa e verificr se a placa foi digitada corretamente
 placa = input('Insira sua placa: ')
-sleep(1)
 print("-="*5)
 opt = input('Tem certeza que essa é sua placa?\n[ 0 ] Não\n[ 1 ] Sim\n')
 while int(opt) == 0:
-    sleep(1)
     print('-='*5)
     placa = input('Insira sua placa: ')
     opt = input('Tem certeza que essa é sua placa?\n[ 0 ] Não\n[ 1 ] Sim\n')
     while int(opt) < 0 or int(opt) > 1:
-        sleep(1)
         print('-='*5)
         print('O valor deve ser entre 1 e 2')
         opt = input('Tem certeza que essa é sua placa?\n[ 0 ] Não\n[ 1 ] Sim\n')
@@ -75,26 +75,28 @@ while int(opt) == 0:
 for i in range(0, 2):
     print("-="*5)
     print("\nQual a/o {} do seu veículo?\n".format(qst[i]))
-    sleep(1)
     if i == 0:
         user_temp.append(int(input('''[ 0 ] Compacto
 [ 1 ] Médio\n: ''')))
     #Ler marca do veículo caso e indicar corretamente caso seja da categoria médio ou compacto
     if i == 1 and user_temp[0] == 0:
-        sleep(1)
         for j in range(0,3):
             print("[ {} ] {}".format(j, veiculos_json["Veiculo_Compacto"][j]["Marca"]))
         user_temp.append(int(input("\n: " )))
     if i == 1 and user_temp[0] == 1:
-        sleep(1)
         for j in range(0,3):
             print("[ {} ] {}".format(j, veiculos_json["Veiculo_Medio"][j]["Marca"]))
         user_temp.append(int(input("\n: " )))
 
+
 user_fnl["Placa"] = placa
 user_fnl["Categoria"] = chave[user_temp[0]]
-user_fnl = user_fnl | veiculos_json["{}".format(user_fnl["Categoria"])][user_temp[1]]
+codigo["Codigo"] = veiculos_json["{}".format(user_fnl["Categoria"])][user_temp[1]]["Codigo"]
+user_fnl = user_fnl | codigo
 
-Criptografia.generate_keys()
+Json_manipular.criar_json(json.dumps(user_fnl, indent=4))
+
+#CODIGO DE CRIPTOGRADIA, TALVEZ EU USE...
+"""Criptografia.generate_keys()
 Criptografia.pubKey, Criptografia.privKey = Criptografia.load_keys()
-Json.criar_json(Criptografia.encrypt(str(user_fnl), Criptografia.pubKey))
+Json.criar_json(Criptografia.encrypt(json.dumps(user_fnl), Criptografia.pubKey))"""
