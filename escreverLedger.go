@@ -60,9 +60,12 @@ func main() {
 
 	json.Unmarshal(tabelaAsBytes, &informacoes_tabela)
 	json.Unmarshal(tokenAsBytes, &informacoes_token)
-	//CONTINUAR DPS
-	//fmt.Println("Digite ")
-	//arg1 := os.Args[0]
+
+	arg1 := os.Args[1]
+	if arg1 == informacoes_token.Placa {
+	} else {
+		panic("SUA PLACA NÃO COINCIDE")
+	}
 
 	if informacoes_token.Categoria == "Veiculo_Medio" {
 		for i := 0; i <= len(informacoes_tabela.Veiculo_Medio)-1; i++ {
