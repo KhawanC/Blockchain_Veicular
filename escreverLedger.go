@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	//"bytes"
 	//"crypto/rand"
 	//"crypto/rsa"
@@ -23,13 +24,14 @@ type Veiculo_Cif struct {
 }
 
 type Veiculo struct {
-	Veiculo_Compacto []Veiculo `json:"Veiculo_Compacto"`
-	Veiculo_Medio    []Veiculo `json:"Veiculo_Medio"`
 	Categoria        string    `json:"Categoria"`
 	Marca            string    `json:"Marca"`
 	Versao           string    `json:"Versao"`
 	Modelo           string    `json:"Modelo"`
+	Emissao          int       `json:"Emissao"`
 	Codigo           string    `json:"Codigo"`
+	Veiculo_Compacto []Veiculo `json:"Veiculo_Compacto"`
+	Veiculo_Medio    []Veiculo `json:"Veiculo_Medio"`
 }
 
 func verificarErro(err error) {
@@ -56,7 +58,6 @@ func main() {
 
 	var informacoes_tabela Veiculo
 	var informacoes_token Veiculo_Cif
-	var ledger_map Veiculo
 
 	json.Unmarshal(tabelaAsBytes, &informacoes_tabela)
 	json.Unmarshal(tokenAsBytes, &informacoes_token)
@@ -70,23 +71,33 @@ func main() {
 	if informacoes_token.Categoria == "Veiculo_Medio" {
 		for i := 0; i <= len(informacoes_tabela.Veiculo_Medio)-1; i++ {
 			if informacoes_token.Codigo == informacoes_tabela.Veiculo_Medio[i].Codigo {
-				ledger_map = informacoes_tabela.Veiculo_Medio[i]
-				fmt.Println(ledger_map)
+				ledger_map := make(map[string]string)
+				ledger_map["Placa"] = informacoes_token.Placa
+				ledger_map["Versao"] = informacoes_tabela.Veiculo_Medio[i].Versao
+				ledger_map["Modelo"] = informacoes_tabela.Veiculo_Medio[i].Modelo
+				ledger_map["Emissao"] = strconv.Itoa(informacoes_tabela.Veiculo_Medio[i].Emissao)
+				ledger_map["Codigo"] = informacoes_tabela.Veiculo_Medio[i].Codigo
+
+				ledger_map2, _ := json.Marshal(ledger_map)
+				fmt.Println(string(ledger_map2))
 			}
 		}
 	}
 	if informacoes_token.Categoria == "Veiculo_Compacto" {
 		for i := 0; i <= len(informacoes_tabela.Veiculo_Compacto)-1; i++ {
 			if informacoes_token.Codigo == informacoes_tabela.Veiculo_Compacto[i].Codigo {
-				ledger_map = informacoes_tabela.Veiculo_Compacto[i]
-				fmt.Println(ledger_map)
+				ledger_map := make(map[string]string)
+				ledger_map["Placa"] = informacoes_token.Placa
+				ledger_map["Versao"] = informacoes_token.Placa
+				ledger_map["Modelo"] = informacoes_tabela.Veiculo_Compacto[i].Modelo
+				ledger_map["Emissao"] = strconv.Itoa(informacoes_tabela.Veiculo_Compacto[i].Emissao)
+				ledger_map["Codigo"] = informacoes_tabela.Veiculo_Compacto[i].Codigo
+
+				ledger_map2, _ := json.Marshal(ledger_map)
+				fmt.Println(string(ledger_map2))
 			}
 		}
 	}
-	fmt.Println("-------------------------------")
-	fmt.Println(informacoes_tabela.Veiculo_Medio[0].Codigo)
-	fmt.Println("-------------------------------")
-	fmt.Println(informacoes_token.Codigo)
 
 	//CODIGO ANTIGO, TALVEZ EU USE
 	/*mess64 := base64.StdEncoding.EncodeToString([]byte(message))

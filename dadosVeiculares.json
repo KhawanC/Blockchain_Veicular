@@ -10,7 +10,7 @@
 			"Marca": "Hyundai",
 			"Versao": "HB20",
 			"Modelo": "Vision21/22",
-			"Emissão": 97,
+			"Emissao": 97,
 			"Codigo": "CHYDHB2VIS97"
 		},
 		{
@@ -19,6 +19,28 @@
 			"Modelo": "XSTD",
 			"Emissao": 100,
 			"Codigo": "CTYTETHXST100"
+		},
+		{
+			"Marca": "Ford",
+			"Versao": "Ka Hatch",
+			"Modelo": "SE",
+			"Emissao": 92,
+			"Codigo": "CFRDKAHSEE92"
+
+		},
+		{
+			"Marca": "MINI",
+			"Versao": "Cooper",
+			"Modelo": "5P",
+			"Emissao": 105,
+			"Codigo": "CMNICPR5PP105"
+		},
+		{
+			"Marca": "Renault",
+			"Versao": "Sandero",
+			"Modelo": "Life",
+			"Emissao": 97,
+			"Codigo": "CRNTSDRLFE97"
 		}
 	],
 	"Veiculo_Medio": [{
@@ -42,6 +64,28 @@
 			"Modelo": "XSTD",
 			"Emissao": 98,
 			"Codigo": "MTYTETSXST98"
+		},
+		{
+			"Marca": "NIISAN",
+			"Versao": "V-DRIVE",
+			"Modelo": "16 MT",
+			"Emissao": 99,
+			"Codigo": "MNSNVDR16M99"
+		},
+		{
+			"Marca": "KIA",
+			"Versao": "RIO",
+			"Modelo": "EX 1.6 FF AT HB",
+			"Emissao": 115,
+			"Codigo": "MKIARIOEXF115"
+		},
+		{
+			"Marca": "CHEVROLET",
+			"Versao": "ONIX PLUS",
+			"Modelo": "3LT",
+			"Emissao": 88,
+			"Codigo": "MCVLOXP3LT88"
 		}
+
 	]
 }

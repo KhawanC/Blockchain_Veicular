@@ -2,6 +2,7 @@ from random import gauss
 from time import sleep
 from unittest import skip
 import numpy as np, json
+#from hfc.fabric import Client
 #import math, rsa
 
 #FUNÇÕES PARA CRIPTOGRAFIA RSA, TALVEZ EU USE
@@ -51,6 +52,7 @@ class Json_manipular:
         with open('TOKEN.JSON', 'w') as f:
             f.write(msg)
 
+#cli = Client(net_profile = "test/fixtures/network.json")
 veiculos_json = Json_manipular.ler_json('dadosVeiculares.json')
 qst = ["categoria", "marca"] 
 user_temp = []
@@ -80,11 +82,11 @@ for i in range(0, 2):
 [ 1 ] Médio\n: ''')))
     #Ler marca do veículo caso e indicar corretamente caso seja da categoria médio ou compacto
     if i == 1 and user_temp[0] == 0:
-        for j in range(0,3):
+        for j in range(0,6):
             print("[ {} ] {}".format(j, veiculos_json["Veiculo_Compacto"][j]["Marca"]))
         user_temp.append(int(input("\n: " )))
     if i == 1 and user_temp[0] == 1:
-        for j in range(0,3):
+        for j in range(0,6):
             print("[ {} ] {}".format(j, veiculos_json["Veiculo_Medio"][j]["Marca"]))
         user_temp.append(int(input("\n: " )))
 
