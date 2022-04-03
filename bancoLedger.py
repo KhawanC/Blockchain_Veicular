@@ -14,10 +14,10 @@ if __name__ == "__main__":
         print("É necessário informar o nome do arquivo .json")
         exit(1)
 
-    #try to retrieve the public key
+
     try:
         with open(sys.argv[1] + ".json", 'r', encoding='utf-8') as f:
-            arq_json = f.read()
+            arq_json = json.loads(f.read())
     except:
         print("Não foi possivel carregar o arquivo json. Digite novamente!")
         exit(1)
