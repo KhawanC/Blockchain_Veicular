@@ -47,7 +47,7 @@ func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
 func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 	fn, args := stub.GetFunctionAndParameters()
 
-	if fn == "registerMeter" {
+	if fn == "registrarBanco" {
 		return s.registrarBanco(stub, args)
 
 	} else if fn == "sleepTest" {
@@ -63,18 +63,11 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 		return s.queryLedger(stub, args)
 	}
 
-	//function fn not implemented, notify error
-	return shim.Error("Chaincode does not support this function.")
+	return shim.Error("Chaincode não suporta essa função.")
 }
 
 func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	//validate args vector lenght
-	if !(len(args) == 2 || len(args) == 3) {
-		return shim.Error("It was expected the parameters: <meter id> <public key> [encrypted inital consumption]")
-	}
-
-	//gets the parameters associated with the meter ID and the public key (in PEM format)
 	banco := args[0]
 
 	var bancoInformacoes Veiculos
