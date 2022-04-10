@@ -15,7 +15,7 @@ letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
 igual = False
 
 if __name__ == "__main__":
-    with open('dados.json', 'r', encoding='utf-8') as arq:
+    with open('dadosVeiculares.json', 'r', encoding='utf-8') as arq:
         arq_json = json.loads(arq.read())
 
     for i in range(0, len(arq_json["Veiculo"])):
