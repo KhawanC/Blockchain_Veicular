@@ -50,6 +50,9 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 	if fn == "registrarBanco" {
 		return s.registrarBanco(stub, args)
 
+	} else if fn == "registrarUsuario" {
+		return s.registrarUsuario(stub, args)
+
 	} else if fn == "sleepTest" {
 		return s.sleepTest(stub, args)
 
@@ -68,6 +71,10 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 
 func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
+	if len(args) != 1 {
+		return shim.Error("Não foi encontrado nenhum argumento. Tente novamente!")
+	}
+
 	banco := args[0]
 
 	var bancoInformacoes Veiculos
@@ -80,6 +87,29 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 
 	//notify procedure success
 	return shim.Success(nil)
+}
+
+func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 3 {
+		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
+	}
+	banco := args[0]
+	dadosUsuario := args[1]
+
+	bancoAsBytes, err := stub.GetState(banco)
+
+	if err != nil || bancoAsBytes == nil {
+		return shim.Error("Erro na validação dos dados de veículos!")
+	}
+
+	bancoUsr := Veiculum{}
+
+	fmt.Println("Comparando com banco original...")
+
+	json.Unmarshal(bancoAsBytes, &bancoUsr)
+
+	//Continuar com a captura de dados do usuario com base no arquivo py
 }
 
 func (s *SmartContract) sleepTest(stub shim.ChaincodeStubInterface, args []string) sc.Response {

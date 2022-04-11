@@ -16,13 +16,12 @@ igual = False
 
 if __name__ == "__main__":
     with open('dadosVeiculares.json', 'r', encoding='utf-8') as arq:
-        arq_json = json.loads(arq.read())
+        banco_json = json.loads(arq.read())
 
-    for i in range(0, len(arq_json["Veiculo"])):
-        #print(f'[ {i} ] {arq_json["Veiculo"][i]["Marca"]} - {arq_json["Veiculo"][i]["Versao"]} - {arq_json["Veiculo"][i]["Modelo"]}\n')
+    for i in range(0, len(banco_json["Veiculo"])):
         sleep(0.2)
         sys.stderr.write(
-            f'[ {i} ] {arq_json["Veiculo"][i]["Marca"]} - {arq_json["Veiculo"][i]["Versao"]} - {arq_json["Veiculo"][i]["Modelo"]}\n')
+            f'[ {i} ] {banco_json["Veiculo"][i]["Marca"]} - {banco_json["Veiculo"][i]["Versao"]} - {banco_json["Veiculo"][i]["Modelo"]}\n')
         sys.stderr.write('----------------------------------\n')
     valor = input('Qual a marca do seu carro? ')
 
@@ -127,8 +126,8 @@ if __name__ == "__main__":
         peers=[callpeer],
         cc_name=cc_name,
         cc_version=cc_version,
-        fcn='registrarBanco',
-        args=[arq_json],
+        fcn='registrarUsuario',
+        args=[banco_json, usr],
         cc_pattern=None))
 
     print("Veiculo registrado com sucesso !")
