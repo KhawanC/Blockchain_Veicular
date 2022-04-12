@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"strconv"
 )
 
 type Veiculos struct {
@@ -24,11 +23,14 @@ type Veiculum struct {
 
 func main() {
 
-	banco, err := ioutil.ReadFile("dadosVeiculares.json")
+	bancoAsBytes, err := ioutil.ReadFile("dadosVeiculares.json")
 	if err != nil {
 		log.Fatal(err)
 	}
-	var veiculo Veiculos
+	userPlaca := "ABC1D23"
+	userEnum := 4
+
+	/*var veiculo Veiculos
 	json.Unmarshal([]byte(banco), &veiculo)
 
 	dadosUsuario := [2]string{"4", "ABC12D3"}
@@ -37,6 +39,16 @@ func main() {
 
 	veiculo.Veiculos[usuarioEnum].Placa = usuarioPlaca
 	usrFinal := veiculo.Veiculos[usuarioEnum]
-	fmt.Println(usrFinal)
+
+	veiculoo, _ := json.Marshal(usrFinal)
+
+	fmt.Println(string(veiculoo))*/
+
+	MyBanco := Veiculos{}
+	json.Unmarshal(bancoAsBytes, &MyBanco)
+
+	MyBanco.Veiculos[userEnum].Placa = userPlaca
+
+	fmt.Println(MyBanco.Veiculos[userEnum])
 
 }

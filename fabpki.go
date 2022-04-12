@@ -64,12 +64,9 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	}
 
 	banco := args[0]
+	bancoAsBytes, _ := json.Marshal(banco)
 
-	var bancoInformacoes Veiculos
-
-	bancoAsBytes, _ := json.Marshal(bancoInformacoes)
-
-	stub.PutState(banco, bancoAsBytes)
+	stub.PutState(1, bancoAsBytes)
 
 	fmt.Println("Registrando seu banco de veiculos...")
 
@@ -79,27 +76,27 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 
 func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 3 {
+	if len(args) != 2 {
 		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
 	}
 	banco := args[0]
 	userPlaca := args[1]
 	userEnum, err := strconv.Atoi(args[2])
 
-	bancoAsBytes, err := stub.GetState(banco)
+	bancoVirtual, _ := json.Marshal(banco)
+	bancoAsBytes, err := stub.GetState(1)
 
-	if err != nil || bancoAsBytes == nil {
+	if err != nil || bancoAsBytes == nil || bancoVirtual != bancoAsBytes {
 		return shim.Error("Erro na validação dos dados de veículos!")
 	}
 
-	bancoUsr := Veiculos{}
-	json.Unmarshal(bancoAsBytes, &bancoUsr)
+	MyBanco := Veiculos{}
+	json.Unmarshal(bancoAsBytes, &MyBanco)
 
-	bancoUsr.Veiculos[userEnum].Placa = userPlaca
-	usrNormal := bancoUsr.Veiculos[userEnum]
-	usrAsBytes, _ := json.Marshal(usrNormal)
-	stub.PutState(usrNormal, usrAsBytes)
+	MyBanco.Veiculos[userEnum].Placa = userPlaca
+	userAsBytes, _ := json.Marshal(MyBanco.Veiculos[userEnum])
 
+	stub.PutState(userPlaca, userAsBytes)
 	fmt.Println("Registrando seu veículo...")
 
 	return shim.Success(nil)

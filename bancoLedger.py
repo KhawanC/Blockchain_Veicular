@@ -117,6 +117,8 @@ if __name__ == "__main__":
     with open('dadosVeiculares.json', 'w', ) as arq:
         arq.write(json.dumps(arq_json))
 
+    arq_json = str(arq_json)
+
     loop = asyncio.get_event_loop()
 
     c_hlf = client_fabric(net_profile=(domain + ".json"))

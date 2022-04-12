@@ -8,7 +8,6 @@ domain = "ptb.de"
 channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
-usr = []
 nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
           'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -99,6 +98,9 @@ if __name__ == "__main__":
 
     if igual == False:
         raise Exception("PLACA INVÁLIDA")
+
+    banco_json = str(banco_json)
+    valor = str(valor)
 
     loop = asyncio.get_event_loop()
 
