@@ -22,6 +22,8 @@ import (
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
+var idBanco = "1"
+
 type SmartContract struct {
 }
 
@@ -66,7 +68,7 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	banco := args[0]
 	bancoAsBytes, _ := json.Marshal(banco)
 
-	stub.PutState(1, bancoAsBytes)
+	stub.PutState(idBanco, bancoAsBytes)
 
 	fmt.Println("Registrando seu banco de veiculos...")
 
@@ -79,14 +81,12 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	if len(args) != 2 {
 		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
 	}
-	banco := args[0]
-	userPlaca := args[1]
-	userEnum, err := strconv.Atoi(args[2])
+	userPlaca := args[0]
+	userEnum, err := strconv.Atoi(args[1])
 
-	bancoVirtual, _ := json.Marshal(banco)
-	bancoAsBytes, err := stub.GetState(1)
+	bancoAsBytes, err := stub.GetState(idBanco)
 
-	if err != nil || bancoAsBytes == nil || bancoVirtual != bancoAsBytes {
+	if err != nil || bancoAsBytes == nil {
 		return shim.Error("Erro na validação dos dados de veículos!")
 	}
 

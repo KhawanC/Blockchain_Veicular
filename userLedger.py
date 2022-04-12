@@ -99,7 +99,6 @@ if __name__ == "__main__":
     if igual == False:
         raise Exception("PLACA INVÁLIDA")
 
-    banco_json = str(banco_json)
     valor = str(valor)
 
     loop = asyncio.get_event_loop()
@@ -125,7 +124,7 @@ if __name__ == "__main__":
         cc_name=cc_name,
         cc_version=cc_version,
         fcn='registrarUsuario',
-        args=[banco_json, placa, valor],
+        args=[placa, valor],
         cc_pattern=None))
 
     print("Veiculo registrado com sucesso !")
