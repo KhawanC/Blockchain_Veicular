@@ -100,10 +100,6 @@ if __name__ == "__main__":
     if igual == False:
         raise Exception("PLACA INVÁLIDA")
 
-    usr.append(valor)
-    usr.append(placa)
-    print(type(usr), usr)
-
     loop = asyncio.get_event_loop()
 
     c_hlf = client_fabric(net_profile=(domain + ".json"))
@@ -127,7 +123,7 @@ if __name__ == "__main__":
         cc_name=cc_name,
         cc_version=cc_version,
         fcn='registrarUsuario',
-        args=[banco_json, usr],
+        args=[banco_json, placa, valor],
         cc_pattern=None))
 
     print("Veiculo registrado com sucesso !")
