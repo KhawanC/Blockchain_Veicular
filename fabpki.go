@@ -14,10 +14,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"strconv"
-
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
@@ -25,17 +22,12 @@ import (
 type SmartContract struct {
 }
 
-type Veiculos struct {
-	Veiculos []Veiculum `json:"Veiculo"`
-}
-
-type Veiculum struct {
+type Veiculo struct {
 	Categoria string `json:"Categoria"`
 	Marca     string `json:"Marca"`
 	Versao    string `json:"Versao"`
 	Modelo    string `json:"Modelo"`
 	Emissao   int    `json:"Emissao"`
-	Codigo    string `json:"Codigo"`
 	Placa     string `json:Placa`
 }
 
@@ -59,14 +51,14 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 
 func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 1 {
+	if len(args) != 2 {
 		return shim.Error("Não foi encontrado nenhum argumento. Tente novamente!")
 	}
 
-	banco := args[0]
-	bancoAsBytes, _ := json.Marshal(banco)
+	idVeiculo := args[0]
+	veiculoInfo := args[1]
 
-	stub.PutState(1, bancoAsBytes)
+	var info = Veiculo{veiculoInfo}
 
 	fmt.Println("Registrando seu banco de veiculos...")
 
@@ -76,7 +68,7 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 
 func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 2 {
+	/*if len(args) != 2 {
 		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
 	}
 	banco := args[0]
@@ -99,7 +91,7 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	stub.PutState(userPlaca, userAsBytes)
 	fmt.Println("Registrando seu veículo...")
 
-	return shim.Success(nil)
+	return shim.Success(nil)*/
 
 }
 
