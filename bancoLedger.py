@@ -37,7 +37,12 @@ if __name__ == "__main__":
 
     c_hlf.new_channel(channel_name)
 
-    for i in arq_json["Veiculo"]:
+    for idVeiculo in arq_json["Veiculo"]:
+        categoria = arq_json["Veiculo"][i]["Categoria"]
+        marca = arq_json["Veiculo"][i]["Marca"]
+        versao = arq_json["Veiculo"][i]["Versao"]
+        modelo = arq_json["Veiculo"][i]["Modelo"]
+        emissao = arq_json["Veiculo"][i]["Emissao"]
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,
@@ -45,7 +50,7 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarBanco',
-            args=[i, arq_json["Veiculo"][i]],
+            args=[idVeiculo, categoria, marca, versao, modelo, emissao],
             cc_pattern=None))
 
     print("Successo em registrar seu banco de dados!")

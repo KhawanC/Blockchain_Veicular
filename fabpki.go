@@ -14,9 +14,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
+	"strconv"
 )
 
 var idBanco = "1"
@@ -25,12 +27,12 @@ type SmartContract struct {
 }
 
 type Veiculo struct {
-	Categoria string `json:"Categoria"`
-	Marca     string `json:"Marca"`
-	Versao    string `json:"Versao"`
-	Modelo    string `json:"Modelo"`
-	Emissao   int    `json:"Emissao"`
-	Placa     string `json:Placa`
+	Categoria string  `json:"Categoria"`
+	Marca     string  `json:"Marca"`
+	Versao    string  `json:"Versao"`
+	Modelo    string  `json:"Modelo"`
+	Emissao   float64 `json:"Emissao"`
+	Placa     string  `json:Placa`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -53,22 +55,37 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 
 func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 2 {
+	if len(args) != 6 {
 		return shim.Error("Não foi encontrado nenhum argumento. Tente novamente!")
 	}
-
+	//Inserindo argumentos dentro de variáveis
 	idVeiculo := args[0]
-	veiculoInfo := args[1]
+	categoria := args[1]
+	marca := args[2]
+	versao := args[3]
+	modelo := args[4]
+	emissao := args[5]
+	emissaoDouble, err := strconv.ParseFloat(emissao, 64)
+	if err == nil {
+		fmt.Println("Erro ao converter dados de emissão")
+	}
 
-<<<<<<< HEAD
-	var info = Veiculo{veiculoInfo}
-=======
-	stub.PutState(idBanco, bancoAsBytes)
->>>>>>> b926850dfad32a374c72fb1888100e3328dac4d9
+	var veiculoInfor = Veiculo{Categoria: categoria,
+		Marca:   marca,
+		Versao:  versao,
+		Modelo:  modelo,
+		Emissao: emissaoDouble,
+	}
 
+	//Encapsulando as informações do veículo em um único JSON
+	veiculoAsBytes, _ := json.Marshal(veiculoInfor)
+
+	//Inserindo valores no ledger, com uma informação associada à uma chave
+	stub.PutState(idVeiculo, veiculoAsBytes)
+
+	//Confirmação do chaincode
 	fmt.Println("Registrando seu banco de veiculos...")
-
-	//notify procedure success
+	fmt.Println(veiculoInfor)
 	return shim.Success(nil)
 }
 
