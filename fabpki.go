@@ -16,9 +16,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
-	"strconv"
 )
 
 var idBanco = "1"
@@ -27,12 +27,12 @@ type SmartContract struct {
 }
 
 type Veiculo struct {
-	Categoria string  `json:"Categoria"`
-	Marca     string  `json:"Marca"`
-	Versao    string  `json:"Versao"`
-	Modelo    string  `json:"Modelo"`
-	Emissao   float64 `json:"Emissao"`
-	Placa     string  `json:Placa`
+	Categoria string `json:"Categoria"`
+	Marca     string `json:"Marca"`
+	Versao    string `json:"Versao"`
+	Modelo    string `json:"Modelo"`
+	Emissao   string `json:"Emissao"`
+	Placa     string `json:"Placa"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -53,6 +53,7 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 	return shim.Error("Chaincode não suporta essa função.")
 }
 
+//Função que recebe bancoLedger.py e inserer o banco de dados com os veículos
 func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 6 {
@@ -65,16 +66,12 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	versao := args[3]
 	modelo := args[4]
 	emissao := args[5]
-	emissaoDouble, err := strconv.ParseFloat(emissao, 64)
-	if err == nil {
-		fmt.Println("Erro ao converter dados de emissão")
-	}
 
 	var veiculoInfor = Veiculo{Categoria: categoria,
 		Marca:   marca,
 		Versao:  versao,
 		Modelo:  modelo,
-		Emissao: emissaoDouble,
+		Emissao: emissao,
 	}
 
 	//Encapsulando as informações do veículo em um único JSON
@@ -110,9 +107,9 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	userAsBytes, _ := json.Marshal(MyBanco.Veiculos[userEnum])
 
 	stub.PutState(userPlaca, userAsBytes)
-	fmt.Println("Registrando seu veículo...")
+	fmt.Println("Registrando seu veículo...")*/
 
-	return shim.Success(nil)*/
+	return shim.Success(nil)
 
 }
 

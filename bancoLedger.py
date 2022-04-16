@@ -11,18 +11,18 @@ cc_version = "1.0"
 
 
 if __name__ == "__main__":
-    #Salvar json de dados veicular em uma variavel de nome arq_json
+    # Salvar json de dados veicular em uma variavel de nome arq_json
     with open("dadosVeicularesBase.json") as f:
         arq_json = json.load(f)
 
-    #Atualizar todas as emissões dentro do arq_json com base no cálculo de distribuição normal
+    # Atualizar todas as emissões dentro do arq_json com base no cálculo de distribuição normal
     for i in arq_json["Veiculo"]:
         arq_json["Veiculo"][i]["Emissao"] = gauss(
             arq_json["Veiculo"][i]["Emissao"], 10)
 
     print("Dados de emissão atualizados")
 
-    #Criar um novo json com os dados atualizados
+    # Criar um novo json com os dados atualizados
     with open('dadosVeicularesAtualizados.json', 'w', ) as arq:
         arq.write(json.dumps(arq_json))
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarBanco',
-            args=[idVeiculo, categoria, marca, versao, modelo, emissao],
+            args=[idVeiculo, categoria, marca, versao, modelo, str(emissao)],
             cc_pattern=None))
 
     print("Successo em registrar seu banco de dados!")
