@@ -16,7 +16,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
@@ -32,6 +31,7 @@ type Veiculo struct {
 	Versao    string `json:"Versao"`
 	Modelo    string `json:"Modelo"`
 	Emissao   string `json:"Emissao"`
+	Codigo    string `json:"Codigo"`
 	Placa     string `json:"Placa"`
 }
 
@@ -56,9 +56,11 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 //Função que recebe bancoLedger.py e inserer o banco de dados com os veículos
 func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
+	//Verificando se a quantidade de argumnetos é maior que 6
 	if len(args) != 6 {
 		return shim.Error("Não foi encontrado nenhum argumento. Tente novamente!")
 	}
+
 	//Inserindo argumentos dentro de variáveis
 	idVeiculo := args[0]
 	categoria := args[1]
@@ -66,15 +68,18 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	versao := args[3]
 	modelo := args[4]
 	emissao := args[5]
+	codigo := args[0]
 
+	//Inserindo argumentos dentro da Struct Veiculo
 	var veiculoInfor = Veiculo{Categoria: categoria,
 		Marca:   marca,
 		Versao:  versao,
 		Modelo:  modelo,
 		Emissao: emissao,
+		Codigo:  codigo,
 	}
 
-	//Encapsulando as informações do veículo em um único JSON
+	//Encapsulando as informações do veículo em formato JSON
 	veiculoAsBytes, _ := json.Marshal(veiculoInfor)
 
 	//Inserindo valores no ledger, com uma informação associada à uma chave
@@ -86,28 +91,33 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	return shim.Success(nil)
 }
 
+//Função que recebe userLedger e insere o veículo do usuário no Ledger
 func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	/*if len(args) != 2 {
+	//Verificar se existem mais de 2 argumentos no código do cliente
+	if len(args) != 2 {
 		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
 	}
 	userPlaca := args[0]
-	userEnum, err := strconv.Atoi(args[1])
+	cdgVeiculoUser := args[1]
 
-	bancoAsBytes, err := stub.GetState(idBanco)
-
-	if err != nil || bancoAsBytes == nil {
-		return shim.Error("Erro na validação dos dados de veículos!")
+	//Buscar informações referentes ao código do veículo do usuário dentro do ledger
+	veiculoAsBytes, err := stub.GetState(cdgVeiculoUser)
+	if err != nil || veiculoAsBytes == nil {
+		return shim.Error("Erro ao receber dados do veículo")
 	}
 
-	MyBanco := Veiculos{}
-	json.Unmarshal(bancoAsBytes, &MyBanco)
+	//Criar um Struct para manipular as informações do veículo
+	userVeiculo := Veiculo{}
 
-	MyBanco.Veiculos[userEnum].Placa = userPlaca
-	userAsBytes, _ := json.Marshal(MyBanco.Veiculos[userEnum])
+	//Convertendo veiculoAsBytes para Struct do veículo
+	json.Unmarshal(veiculoAsBytes, &userVeiculo)
 
-	stub.PutState(userPlaca, userAsBytes)
-	fmt.Println("Registrando seu veículo...")*/
+	//Atualizar placa vazia da Struct com a placa do usuário
+	userVeiculo.Placa = userPlaca
+
+	//Inserir valores no ledger. ID = placa do veículo
+	stub.PutState(userPlaca, userVeiculo)
 
 	return shim.Success(nil)
 
