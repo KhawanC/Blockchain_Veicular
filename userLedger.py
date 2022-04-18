@@ -9,7 +9,7 @@ channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
 
-#Variáveis para verificação da placa
+# Variáveis para verificação da placa
 nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
           'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -19,11 +19,11 @@ igual = False
 
 if __name__ == "__main__":
 
-    #Método para ler arquivo json atualizado pelo bancoLedger.py
+    # Método para ler arquivo json atualizado pelo bancoLedger.py
     with open('dadosVeicularesAtualizados.json', 'r', encoding='utf-8') as arq:
         banco_json = json.loads(arq.read())
 
-    #Loop para acessa os dados json e imprimete todos os veículos ordenadamente
+    # Loop para acessa os dados json e imprimete todos os veículos ordenadamente
     contador = 0
     for i in banco_json["Veiculo"]:
         sleep(0.2)
@@ -127,8 +127,6 @@ if __name__ == "__main__":
 
     admin = c_hlf.get_user(domain, 'Admin')
     callpeer = "peer0." + domain
-
-    print("Checando instalação de arquivo fbpki:")
 
     c_hlf.new_channel(channel_name)
 

@@ -16,6 +16,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
@@ -87,7 +88,6 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 
 	//Confirmação do chaincode
 	fmt.Println("Registrando seu banco de veiculos...")
-	fmt.Println(veiculoInfor)
 	return shim.Success(nil)
 }
 
@@ -114,6 +114,7 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	json.Unmarshal(veiculoAsBytes, &userVeiculo)
 
 	//Atualizar placa vazia da Struct com a placa do usuário
+	//Como as informações do veículo já vieram com o Struct userVeiculo, vou alterar apenas a placa
 	userVeiculo.Placa = userPlaca
 
 	//Inserir valores no ledger. ID = placa do veículo

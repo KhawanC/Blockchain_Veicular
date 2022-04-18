@@ -33,16 +33,14 @@ if __name__ == "__main__":
     admin = c_hlf.get_user(domain, 'Admin')
     callpeer = "peer0." + domain
 
-    print("Checando instalação de arquivo fbpki:")
-
     c_hlf.new_channel(channel_name)
 
     for idVeiculo in arq_json["Veiculo"]:
-        categoria = arq_json["Veiculo"][i]["Categoria"]
-        marca = arq_json["Veiculo"][i]["Marca"]
-        versao = arq_json["Veiculo"][i]["Versao"]
-        modelo = arq_json["Veiculo"][i]["Modelo"]
-        emissao = arq_json["Veiculo"][i]["Emissao"]
+        categoria = arq_json["Veiculo"][idVeiculo]["Categoria"]
+        marca = arq_json["Veiculo"][idVeiculo]["Marca"]
+        versao = arq_json["Veiculo"][idVeiculo]["Versao"]
+        modelo = arq_json["Veiculo"][idVeiculo]["Modelo"]
+        emissao = arq_json["Veiculo"][idVeiculo]["Emissao"]
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,
