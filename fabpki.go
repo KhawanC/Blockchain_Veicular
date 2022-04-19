@@ -27,13 +27,15 @@ type SmartContract struct {
 }
 
 type Veiculo struct {
-	Categoria string `json:"Categoria"`
-	Marca     string `json:"Marca"`
-	Versao    string `json:"Versao"`
-	Modelo    string `json:"Modelo"`
-	Emissao   string `json:"Emissao"`
-	Codigo    string `json:"Codigo"`
-	Placa     string `json:"Placa"`
+	Categoria  string `json:"Categoria"`
+	Marca      string `json:"Marca"`
+	Versao     string `json:"Versao"`
+	Modelo     string `json:"Modelo"`
+	Emissao    string `json:"Emissao"`
+	Codigo     string `json:"Codigo"`
+	Placa      string `json:"Placa"`
+	EmissAcum  string `json:"EmissAcum"`
+	Registrado bool   `json:"Registrado"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -49,6 +51,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 	} else if fn == "registrarUsuario" {
 		return s.registrarUsuario(stub, args)
 
+	} else if fn == "registrarTrajeto" {
+		return s.registrarTrajeto(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
@@ -72,12 +76,14 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	codigo := args[0]
 
 	//Inserindo argumentos dentro da Struct Veiculo
-	var veiculoInfor = Veiculo{Categoria: categoria,
-		Marca:   marca,
-		Versao:  versao,
-		Modelo:  modelo,
-		Emissao: emissao,
-		Codigo:  codigo,
+	var veiculoInfor = Veiculo{
+		Categoria:  categoria,
+		Marca:      marca,
+		Versao:     versao,
+		Modelo:     modelo,
+		Emissao:    emissao,
+		Codigo:     codigo,
+		Registrado: true,
 	}
 
 	//Encapsulando as informações do veículo em formato JSON
@@ -122,6 +128,14 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 
 	return shim.Success(nil)
 
+}
+
+func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+	if len(args) != 1 {
+		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
+	}
+
+	return shim.Success(nil)
 }
 
 func main() {

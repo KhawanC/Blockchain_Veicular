@@ -1,56 +1,23 @@
-import json
-import sys
-from time import sleep
+import requests
 from hfc.fabric import Client as client_fabric
 import asyncio
+from time import sleep
 
+bingMapsKey = 'AsmuM7jTKB5hKGiXpA15vY2toMIYZTEq4G_KgLBie0M-BzAeOE17ntxmg4fmC30Q'
+endUsr = []
+endFinal = []
 domain = "ptb.de"
 channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
-
-# Variáveis para verificação da placa
 nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
           'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-tentativa = 0
-contador = 0
-igual = False
 
 if __name__ == "__main__":
-
-    # Método para ler arquivo json atualizado pelo bancoLedger.py
-    with open('dadosVeicularesAtualizados.json', 'r', encoding='utf-8') as arq:
-        banco_json = json.loads(arq.read())
-
-    # Loop para acessa os dados json e imprimete todos os veículos ordenadamente
-    contador = 0
-    for i in banco_json["Veiculo"]:
-        sleep(0.2)
-        sys.stderr.write(f" [ {contador} ] - {banco_json['Veiculo'][i]['Marca']}"
-                         f" - "
-                         f"{banco_json['Veiculo'][i]['Versao']} - {banco_json['Veiculo'][i]['Modelo']}")
-        sys.stderr.write('\n----------------------------------\n')
-        contador += 1
-
-    valor = int(input('Dentre as opções acima, digite a do seu veículo:  '))
-    while (valor < 0 or valor > len(banco_json["Veiculo"])):
-        tentativa += 1
-        if tentativa > 2:
-            raise Exception("Muitas tentativas, encerrando o programa")
-        valor = int(input("Valor incorreto\nDigite novamente: "))
-
-    tentativa = 0
-    while type(valor) != int:
-        try:
-            valor = int(valor)
-        except:
-            print('VALOR INVÁLIDO!')
-            valor = int(input('Qual a marca do seu carro? '))
-
-    # Leitura da placa e verificação de conformidade da mesma
     placa = input("Insira sua placa: ").upper()
 
+    # Leitura da placa e verificação de conformidade da mesma
     if len(placa) != 7:
         raise Exception("PLACA INVÁLIDA")
 
@@ -117,10 +84,50 @@ if __name__ == "__main__":
     if igual == False:
         raise Exception("PLACA INVÁLIDA")
 
-    for cdg in banco_json["Veiculo"]:
-        if valor == contador:
-            cdgUsuario = cdg
-        contador += 1
+    # Loop que pergunta o endereço de partida do usuário
+    for i in range(0, 4):
+        if i == 0:
+            info = input('Digite a sua rua: ')
+        if i == 1:
+            info = input('Digite o seu bairro: ')
+        if i == 2:
+            info = input('Digite a sua cidade: ')
+        if i == 3:
+            info = input('Digite o seu estado: ')
+    endUsr.append(info)
+
+# Simulador de loading...
+    for i in range(0, 2):
+        print('.')
+        sleep(0.5)
+    print('Agora vamos verificar o seu destino...')
+    sleep(1)
+    for i in range(0, 2):
+        print('.')
+        sleep(0.5)
+
+# Loop que pergunta endereço de destino do usuário
+    for i in range(0, 4):
+        if i == 0:
+            info = input('Digite a sua rua: ')
+        if i == 1:
+            info = input('Digite o seu bairro: ')
+        if i == 2:
+            info = input('Digite a sua cidade: ')
+        if i == 3:
+            info = input('Digite o seu estado: ')
+    endFinal.append(info)
+
+# Endereço do trajeto inicial e final juntos em uma única string
+    endJuntoUsr = ' '.join(str(e) for e in endUsr)
+    endJuntoFinal = ' '.join(str(e) for e in endFinal)
+
+# Request para consultar endereço no sistema Bing Maps
+    rotaUrl = "http://dev.virtualearth.net/REST/V1/Routes/Driving?wp.0=" + \
+        endJuntoUsr + '&wp.1=' + endJuntoFinal+"/&key=" + bingMapsKey
+    jsonRequest = requests.get(url=rotaUrl)
+    resultado = jsonRequest.json()
+    distancia = resultado["resourceSets"][0]["resources"][0]["travelDistance"]
 
     loop = asyncio.get_event_loop()
 
@@ -138,7 +145,5 @@ if __name__ == "__main__":
         cc_name=cc_name,
         cc_version=cc_version,
         fcn='registrarUsuario',
-        args=[placa, cdgUsuario],
+        args=[],
         cc_pattern=None))
-
-    print("Veiculo registrado com sucesso !")
