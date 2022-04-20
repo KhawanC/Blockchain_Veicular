@@ -1,6 +1,8 @@
 import sys
 import json
 from random import gauss
+
+from numpy import float64
 from hfc.fabric import Client as client_fabric
 import asyncio
 
@@ -48,7 +50,8 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarBanco',
-            args=[idVeiculo, categoria, marca, versao, modelo, str(emissao)],
+            args=[idVeiculo, categoria, marca,
+                  versao, modelo, str(emissao)],
             cc_pattern=None))
 
     print("Successo em registrar seu banco de dados!")

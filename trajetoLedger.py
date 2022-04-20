@@ -145,5 +145,5 @@ if __name__ == "__main__":
         cc_name=cc_name,
         cc_version=cc_version,
         fcn='registrarUsuario',
-        args=[],
+        args=[placa, str(distancia)],
         cc_pattern=None))

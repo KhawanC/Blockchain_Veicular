@@ -16,6 +16,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
@@ -27,15 +28,15 @@ type SmartContract struct {
 }
 
 type Veiculo struct {
-	Categoria  string `json:"Categoria"`
-	Marca      string `json:"Marca"`
-	Versao     string `json:"Versao"`
-	Modelo     string `json:"Modelo"`
-	Emissao    string `json:"Emissao"`
-	Codigo     string `json:"Codigo"`
-	Placa      string `json:"Placa"`
-	EmissAcum  string `json:"EmissAcum"`
-	Registrado bool   `json:"Registrado"`
+	Categoria  string  `json:"Categoria"`
+	Marca      string  `json:"Marca"`
+	Versao     string  `json:"Versao"`
+	Modelo     string  `json:"Modelo"`
+	EmissaoPad string  `json:"EmissaoPad"`
+	Codigo     string  `json:"Codigo"`
+	Placa      string  `json:"Placa"`
+	PercAcum   float64 `json:"PercAcum"`
+	Registrado bool    `json:"Registrado"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -81,9 +82,9 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 		Marca:      marca,
 		Versao:     versao,
 		Modelo:     modelo,
-		Emissao:    emissao,
+		EmissaoPad: emissao,
 		Codigo:     codigo,
-		Registrado: true,
+		Registrado: false,
 	}
 
 	//Encapsulando as informações do veículo em formato JSON
@@ -122,6 +123,7 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	//Atualizar placa vazia da Struct com a placa do usuário
 	//Como as informações do veículo já vieram com o Struct userVeiculo, vou alterar apenas a placa
 	userVeiculo.Placa = userPlaca
+	userVeiculo.Registrado = true
 
 	//Inserir valores no ledger. ID = placa do veículo
 	stub.PutState(userPlaca, userVeiculo)
@@ -131,9 +133,33 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 }
 
 func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args []string) sc.Response {
-	if len(args) != 1 {
+	if len(args) != 2 {
 		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
 	}
+	userPlaca := args[0]
+	userDistancia := args[1]
+
+	distFloat, err := strconv.ParseFloat(userDistancia, 64)
+	if err != nil {
+		return shim.Error("Erro ao converter distância do usuário")
+	}
+
+	userVeiculo := Veiculo{}
+
+	veiculoAsBytes, err := stub.GetState(userPlaca)
+	if err != nil || veiculoAsBytes == nil {
+
+		userVeiculo.Placa = userPlaca
+		userVeiculo.PercAcum += distFloat
+
+		stub.PutState(userPlaca, userVeiculo)
+
+		return shim.Success(nil)
+	}
+
+	json.Unmarshal(veiculoAsBytes, &userVeiculo)
+
+	userVeiculo.PercAcum += distFloat
 
 	return shim.Success(nil)
 }
