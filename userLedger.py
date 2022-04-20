@@ -14,7 +14,6 @@ nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
           'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 tentativa = 0
-contador = 0
 igual = False
 
 if __name__ == "__main__":
@@ -117,8 +116,9 @@ if __name__ == "__main__":
     if igual == False:
         raise Exception("PLACA INVÁLIDA")
 
+    contador2 = 0
     for cdg in banco_json["Veiculo"]:
-        if valor == contador:
+        if valor == contador2:
             cdgUsuario = cdg
         contador += 1
 
