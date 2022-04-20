@@ -22,21 +22,27 @@ import (
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
-var idBanco = "1"
-
 type SmartContract struct {
 }
 
 type Veiculo struct {
-	Categoria  string  `json:"Categoria"`
-	Marca      string  `json:"Marca"`
-	Versao     string  `json:"Versao"`
-	Modelo     string  `json:"Modelo"`
-	EmissaoPad string  `json:"EmissaoPad"`
-	Codigo     string  `json:"Codigo"`
-	Placa      string  `json:"Placa"`
-	PercAcum   float64 `json:"PercAcum"`
-	Registrado bool    `json:"Registrado"`
+	Categoria  string `json:"Categoria"`
+	Marca      string `json:"Marca"`
+	Versao     string `json:"Versao"`
+	Modelo     string `json:"Modelo"`
+	EmissaoPad string `json:"EmissaoPad"`
+	CdgVeiculo string `json:"CdgVeiculo"`
+}
+
+type Usuario struct {
+	Placa        string `json:"Placa"`
+	IdCdgVeiculo string `json:"IdCdgVeiculo"`
+}
+
+type TrajetoUsuario struct {
+	IdPlaca          string  `json:"IdPlaca"`
+	TrajetoAcumulado float64 `json:"TrajetoAcumulador"`
+	QtdTrajetos      int     `json:"QtdTrajetos"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -68,13 +74,12 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	}
 
 	//Inserindo argumentos dentro de variáveis
-	idVeiculo := args[0]
+	codigo := args[0]
 	categoria := args[1]
 	marca := args[2]
 	versao := args[3]
 	modelo := args[4]
 	emissao := args[5]
-	codigo := args[0]
 
 	//Inserindo argumentos dentro da Struct Veiculo
 	var veiculoInfor = Veiculo{
@@ -83,15 +88,14 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 		Versao:     versao,
 		Modelo:     modelo,
 		EmissaoPad: emissao,
-		Codigo:     codigo,
-		Registrado: false,
+		CdgVeiculo: codigo,
 	}
 
 	//Encapsulando as informações do veículo em formato JSON
 	veiculoAsBytes, _ := json.Marshal(veiculoInfor)
 
 	//Inserindo valores no ledger, com uma informação associada à uma chave
-	stub.PutState(idVeiculo, veiculoAsBytes)
+	stub.PutState(codigo, veiculoAsBytes)
 
 	//Confirmação do chaincode
 	fmt.Println("Registrando seu banco de veiculos...")
@@ -103,27 +107,16 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 
 	//Verificar se existem mais de 2 argumentos no código do cliente
 	if len(args) != 2 {
-		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
+		return shim.Error("Eram esperados 2 argumentos... Tente novamente!")
 	}
 	userPlaca := args[0]
 	cdgVeiculoUser := args[1]
 
-	//Buscar informações referentes ao código do veículo do usuário dentro do ledger
-	veiculoAsBytes, err := stub.GetState(cdgVeiculoUser)
-	if err != nil || veiculoAsBytes == nil {
-		return shim.Error("Erro ao receber dados do veículo")
+	//Criar Struct para manipular as informações do veículo
+	userVeiculo := Usuario{
+		Placa:        userPlaca,
+		IdCdgVeiculo: cdgVeiculoUser,
 	}
-
-	//Criar um Struct para manipular as informações do veículo
-	userVeiculo := Veiculo{}
-
-	//Convertendo veiculoAsBytes para Struct do veículo
-	json.Unmarshal(veiculoAsBytes, &userVeiculo)
-
-	//Atualizar placa vazia da Struct com a placa do usuário
-	//Como as informações do veículo já vieram com o Struct userVeiculo, vou alterar apenas a placa
-	userVeiculo.Placa = userPlaca
-	userVeiculo.Registrado = true
 
 	veiculoAsBytesFinal, _ := json.Marshal(userVeiculo)
 
@@ -135,39 +128,59 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 }
 
 func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	//Verificar se arquivo py retornou 2 argumentos
 	if len(args) != 2 {
-		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
+		return shim.Error("Eram esperados 2 argumentos... Tente novamente!")
 	}
+
+	//Dar nome aos argumentos
 	userPlaca := args[0]
 	userDistancia := args[1]
 
+	//Converter distância do argumento para Float64 pois ela veio como String
 	distFloat, err := strconv.ParseFloat(userDistancia, 64)
 	if err != nil {
 		return shim.Error("Erro ao converter distância do usuário")
 	}
 
-	userVeiculo := Veiculo{}
+	//Criar Struct do trajeto e do usuário
+	infoTrajeto := TrajetoUsuario{}
+	userVeiculo := Usuario{}
 
-	veiculoAsBytes, err := stub.GetState(userPlaca)
-	if err != nil || veiculoAsBytes == nil {
+	//Verificar se o usuário existe no Ledger
+	UsuarioAsBytes, err := stub.GetState(userPlaca)
+	if err != nil || UsuarioAsBytes == nil {
 
+		//Caso não exista, criar uma assinatura no Ledger com a sua placa, mas suas especificações ficarão desconhecidas
 		userVeiculo.Placa = userPlaca
-		userVeiculo.PercAcum = userVeiculo.PercAcum + distFloat
 
-		veiculoAsBytesFinal, _ := json.Marshal(userVeiculo)
+		//Inserindo informações do trajendo em um acumulador e incrementando 1 ao seu contador de trajetos
+		infoTrajeto.IdPlaca = userPlaca
+		infoTrajeto.TrajetoAcumulado += distFloat
+		infoTrajeto.QtdTrajetos += 1
 
-		stub.PutState(userPlaca, veiculoAsBytesFinal)
+		//Encapsulando informações em formato JSON
+		TrajetoAsBytesFinal, _ := json.Marshal(infoTrajeto)
+		UserAsBytesFinal, _ := json.Marshal(userVeiculo)
+
+		//Inserindo informações no Ledger
+		stub.PutState(userPlaca+strconv.Itoa(infoTrajeto.QtdTrajetos), TrajetoAsBytesFinal)
+		stub.PutState(userPlaca, UserAsBytesFinal)
 
 		return shim.Success(nil)
 	}
 
-	json.Unmarshal(veiculoAsBytes, &userVeiculo)
+	//Caso exista, apenas criar uma assinatura de trajeto
+	infoTrajeto.IdPlaca = userPlaca
+	infoTrajeto.TrajetoAcumulado += distFloat
+	infoTrajeto.QtdTrajetos += 1
 
-	userVeiculo.PercAcum = userVeiculo.PercAcum + distFloat
+	//Encapsulando informações em formato JSON
+	trajetoAsBytesFinal, _ := json.Marshal(infoTrajeto)
 
-	veiculoAsBytesFinal, _ := json.Marshal(userVeiculo)
-
-	stub.PutState(userPlaca, veiculoAsBytesFinal)
+	//Inserindo informações no Ledger
+	stub.PutState(userPlaca, trajetoAsBytesFinal)
 
 	return shim.Success(nil)
 }

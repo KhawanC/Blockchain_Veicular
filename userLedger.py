@@ -120,7 +120,7 @@ if __name__ == "__main__":
     for cdg in banco_json["Veiculo"]:
         if valor == contador2:
             cdgUsuario = cdg
-        contador += 1
+        contador2 += 1
 
     loop = asyncio.get_event_loop()
 
