@@ -125,8 +125,10 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	userVeiculo.Placa = userPlaca
 	userVeiculo.Registrado = true
 
+	veiculoAsBytesFinal, _ := json.Marshal(userVeiculo)
+
 	//Inserir valores no ledger. ID = placa do veículo
-	stub.PutState(userPlaca, userVeiculo)
+	stub.PutState(userPlaca, veiculoAsBytesFinal)
 
 	return shim.Success(nil)
 
@@ -150,16 +152,22 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	if err != nil || veiculoAsBytes == nil {
 
 		userVeiculo.Placa = userPlaca
-		userVeiculo.PercAcum += distFloat
+		userVeiculo.PercAcum = userVeiculo.PercAcum + distFloat
 
-		stub.PutState(userPlaca, userVeiculo)
+		veiculoAsBytesFinal, _ := json.Marshal(userVeiculo)
+
+		stub.PutState(userPlaca, veiculoAsBytesFinal)
 
 		return shim.Success(nil)
 	}
 
 	json.Unmarshal(veiculoAsBytes, &userVeiculo)
 
-	userVeiculo.PercAcum += distFloat
+	userVeiculo.PercAcum = userVeiculo.PercAcum + distFloat
+
+	veiculoAsBytesFinal, _ := json.Marshal(userVeiculo)
+
+	stub.PutState(userPlaca, veiculoAsBytesFinal)
 
 	return shim.Success(nil)
 }
