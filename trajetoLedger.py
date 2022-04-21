@@ -1,4 +1,5 @@
 import requests
+import random
 from hfc.fabric import Client as client_fabric
 import asyncio
 from time import sleep
@@ -83,7 +84,7 @@ if __name__ == "__main__":
 
     if igual == False:
         raise Exception("PLACA INVÁLIDA")
-
+    '''
     # Loop que pergunta o endereço de partida do usuário
     for i in range(0, 4):
         if i == 0:
@@ -127,7 +128,9 @@ if __name__ == "__main__":
         endJuntoUsr + '&wp.1=' + endJuntoFinal+"/&key=" + bingMapsKey
     jsonRequest = requests.get(url=rotaUrl)
     resultado = jsonRequest.json()
-    distancia = resultado["resourceSets"][0]["resources"][0]["travelDistance"]
+    distancia = resultado["resourceSets"][0]["resources"][0]["travelDistance"]'''
+
+    distancia = random.randint(50, 5000)
 
     loop = asyncio.get_event_loop()
 
@@ -144,6 +147,6 @@ if __name__ == "__main__":
         peers=[callpeer],
         cc_name=cc_name,
         cc_version=cc_version,
-        fcn='registrarUsuario',
+        fcn='registrarTrajeto',
         args=[placa, str(distancia)],
         cc_pattern=None))

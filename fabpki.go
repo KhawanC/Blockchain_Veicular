@@ -165,7 +165,7 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 		UserAsBytesFinal, _ := json.Marshal(userVeiculo)
 
 		//Inserindo informações no Ledger
-		stub.PutState(userPlaca+strconv.Itoa(infoTrajeto.QtdTrajetos), TrajetoAsBytesFinal)
+		stub.PutState((userPlaca + strconv.Itoa(infoTrajeto.QtdTrajetos)), TrajetoAsBytesFinal)
 		stub.PutState(userPlaca, UserAsBytesFinal)
 
 		return shim.Success(nil)
@@ -180,7 +180,7 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	trajetoAsBytesFinal, _ := json.Marshal(infoTrajeto)
 
 	//Inserindo informações no Ledger
-	stub.PutState(userPlaca, trajetoAsBytesFinal)
+	stub.PutState((userPlaca + strconv.Itoa(infoTrajeto.QtdTrajetos)), trajetoAsBytesFinal)
 
 	return shim.Success(nil)
 }
