@@ -1,7 +1,6 @@
 import json, random
 from scipy.stats import invgauss
 from os import path
-import pandas as pd
 from IPython.display import display
 
 arq_dir = 'C:/Users/9S/Desktop/testes_1/veiculo.json'

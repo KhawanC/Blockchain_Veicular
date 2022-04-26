@@ -1,32 +1,43 @@
 package main
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
-	"strconv"
+	"math/rand"
+	"reflect"
+	"time"
 )
 
-type Veiculo struct {
-	Categoria string  `json:"Categoria"`
-	Marca     string  `json:"Marca"`
-	Versao    string  `json:"Versao"`
-	Modelo    string  `json:"Modelo"`
-	Emissao   float64 `json:"Emissao"`
-	Placa     string  `json:"Placa"`
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+
+type Contador struct {
+	Contador int
+}
+
+func AleatString(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+func Encode(msg string) string {
+	h := sha1.New()
+	h.Write([]byte(msg))
+	sha1_hash := hex.EncodeToString(h.Sum(nil))
+	return sha1_hash
 }
 
 func main() {
-	veiculoInfo := Veiculo{Categoria: "Compacto", Marca: "VW", Versao: "GOL", Modelo: "PATRULHEIRO", Emissao: 113.08668705501557}
+	rand.Seed(time.Now().UnixNano())
 
-	numeroString := "113.08668705501557"
+	ctg := Contador{}
+	fmt.Println(ctg.Contador + 1)
 
-	if numeroDouble, err := strconv.ParseFloat(numeroString, 32); err == nil {
-		fmt.Println(numeroDouble)
-	}
+	msg := Encode(AleatString(20))
 
-	if numeroDouble, err := strconv.ParseFloat(numeroString, 64); err == nil {
-		fmt.Println(numeroDouble)
-	}
-
-	fmt.Println(veiculoInfo)
+	fmt.Println(msg, "---", reflect.ValueOf(msg).Kind())
 
 }

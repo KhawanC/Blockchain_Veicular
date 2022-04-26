@@ -1,0 +1,88 @@
+{
+    "Veiculo":{
+       "CVKWGOLPAT112":{
+          "Categoria":"Compacto",
+          "Marca":"VW",
+          "Versao":"GOL",
+          "Modelo":"PATRULHEIRO",
+          "Emissao":112
+       },
+       "CHYDHB2VIS97":{
+          "Categoria":"Compacto",
+          "Marca":"Hyundai",
+          "Versao":"HB20",
+          "Modelo":"Vision21/22",
+          "Emissao":97
+       },
+       "CTYTETHXST100": {
+        "Categoria": "Compacto",
+        "Marca": "Toyota",
+        "Versao": "Etios Hatback",
+        "Modelo": "XSTD",
+        "Emissao": 100
+       },
+       "CFRDKAHSEE92":{
+          "Categoria":"Compacto",
+          "Marca":"Ford",
+          "Versao":"Ka Hatch",
+          "Modelo":"SE",
+          "Emissao":92
+       },
+       "CMNICPR5PP105":{
+          "Categoria":"Compacto",
+          "Marca":"MINI",
+          "Versao":"Cooper",
+          "Modelo":"5P",
+          "Emissao":105
+       },
+       "CRNTSDRLFE97":{
+          "Categoria":"Compacto",
+          "Marca":"Renault",
+          "Versao":"Sandero",
+          "Modelo":"Life",
+          "Emissao":97
+       },
+       "MRNTLOGZEN107":{
+          "Categoria":"Medio",
+          "Marca":"Renault",
+          "Versao":"Logan",
+          "Modelo":"Zen",
+          "Emissao":107
+       },
+       "MHNDCTYEXX101":{
+          "Categoria":"Medio",
+          "Marca":"Honda",
+          "Versao":"City",
+          "Modelo":"EX",
+          "Emissao":101
+       },
+       "MTYTETSXST98":{
+          "Categoria":"Medio",
+          "Marca":"Toyota",
+          "Versao":"Etius Seda",
+          "Modelo":"XSTD",
+          "Emissao":98
+       },
+       "MNSNVDR16M99":{
+          "Categoria":"Medio",
+          "Marca":"NIISAN",
+          "Versao":"V-DRIVE",
+          "Modelo":"16 MT",
+          "Emissao":99
+       },
+       "MKIARIOEXF115":{
+          "Categoria":"Medio",
+          "Marca":"KIA",
+          "Versao":"RIO",
+          "Modelo":"EX 1.6 FF AT HB",
+          "Emissao":115
+       },
+       "MCVLOXP3LT88":{
+          "Categoria":"Medio",
+          "Marca":"CHEVROLET",
+          "Versao":"ONIX PLUS",
+          "Modelo":"3LT",
+          "Emissao":88
+       }
+    }
+ }

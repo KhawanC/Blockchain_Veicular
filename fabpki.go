@@ -14,35 +14,62 @@
 package main
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
+//Criar sequencia de letras
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+
+func AleatString(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+func Encode(msg string) string {
+	h := sha1.New()
+	h.Write([]byte(msg))
+	sha1_hash := hex.EncodeToString(h.Sum(nil))
+	return sha1_hash
+}
+
 type SmartContract struct {
 }
 
 type Veiculo struct {
+	CdgVeiculo string `json:"CdgVeiculo"` // PK
 	Categoria  string `json:"Categoria"`
 	Marca      string `json:"Marca"`
 	Versao     string `json:"Versao"`
 	Modelo     string `json:"Modelo"`
 	EmissaoPad string `json:"EmissaoPad"`
-	CdgVeiculo string `json:"CdgVeiculo"`
 }
 
 type Usuario struct {
-	Placa        string `json:"Placa"`
-	IdCdgVeiculo string `json:"IdCdgVeiculo"`
+	Placa        string `json:"Placa"`        // PK
+	IdCdgVeiculo string `json:"IdCdgVeiculo"` //FK (Veiculo)
+}
+
+type Trajeto struct {
+	TrajetoHash      string  `json:"TrajetoHash"` // PK
+	TrajetoDistancia float64 `json:"TrajetoDistancia"`
 }
 
 type TrajetoUsuario struct {
-	IdPlaca          string  `json:"IdPlaca"`
+	Viagem           string  `json:"Viagem"`      // PK
+	IdPlaca          string  `json:"IdPlaca"`     //FK (Usuario)
+	idTrajeto        string  `json:"TrajetoHash"` //FK (Trajeto)
 	TrajetoAcumulado float64 `json:"TrajetoAcumulador"`
-	QtdTrajetos      int     `json:"QtdTrajetos"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -138,6 +165,9 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	userPlaca := args[0]
 	userDistancia := args[1]
 
+	//Criando código unico para Struct trajeto
+	cdgUnico := Encode(AleatString(20))
+
 	//Converter distância do argumento para Float64 pois ela veio como String
 	distFloat, err := strconv.ParseFloat(userDistancia, 64)
 	if err != nil {
@@ -145,42 +175,68 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	}
 
 	//Criar Struct do trajeto e do usuário
-	infoTrajeto := TrajetoUsuario{}
-	userVeiculo := Usuario{}
+	trajetoUsuario := TrajetoUsuario{}
+	trajeto := Trajeto{}
 
 	//Verificar se o usuário existe no Ledger
 	UsuarioAsBytes, err := stub.GetState(userPlaca)
 	if err != nil || UsuarioAsBytes == nil {
 
-		//Caso não exista, criar uma assinatura no Ledger com a sua placa, mas suas especificações ficarão desconhecidas
-		userVeiculo.Placa = userPlaca
+		usuario := Usuario{}
 
-		//Inserindo informações do trajendo em um acumulador e incrementando 1 ao seu contador de trajetos
-		infoTrajeto.IdPlaca = userPlaca
-		infoTrajeto.TrajetoAcumulado += distFloat
-		infoTrajeto.QtdTrajetos += 1
+		fmt.Println("Usuário não encontrado")
 
-		//Encapsulando informações em formato JSON
-		TrajetoAsBytesFinal, _ := json.Marshal(infoTrajeto)
-		UserAsBytesFinal, _ := json.Marshal(userVeiculo)
+		//Criar assinatura do usuário
+		usuario.Placa = userPlaca
 
-		//Inserindo informações no Ledger
-		stub.PutState((userPlaca + strconv.Itoa(infoTrajeto.QtdTrajetos)), TrajetoAsBytesFinal)
-		stub.PutState(userPlaca, UserAsBytesFinal)
+		//Criar assinatura do trajeto
+		trajeto.TrajetoHash = cdgUnico
+		trajeto.TrajetoDistancia = distFloat
 
-		return shim.Success(nil)
+		//Associar trajeto com o usuário
+		trajetoUsuario.Viagem = trajeto.TrajetoHash + "-" + usuario.Placa
+		trajetoUsuario.IdPlaca = usuario.Placa
+		trajetoUsuario.idTrajeto = trajeto.TrajetoHash
+		distOld := trajeto.TrajetoDistancia
+		trajetoUsuario.TrajetoAcumulado += distOld
+
+		//Encapsulando dados em arquivo JSON
+		UsuarioAsBytesFinal, _ := json.Marshal(usuario)
+		TrajetoAsBytes, _ := json.Marshal(trajeto)
+		UsuarioTrajetoAsBytes, _ := json.Marshal(trajetoUsuario)
+
+		//Enviando informações para o Ledger
+		stub.PutState(usuario.Placa, UsuarioAsBytesFinal)
+		stub.PutState(trajeto.TrajetoHash, TrajetoAsBytes)
+		stub.PutState(trajetoUsuario.Viagem, UsuarioTrajetoAsBytes)
+
+		fmt.Println("Dados registrados com sucesso")
+		shim.Success(nil)
 	}
 
-	//Caso exista, apenas criar uma assinatura de trajeto
-	infoTrajeto.IdPlaca = userPlaca
-	infoTrajeto.TrajetoAcumulado += distFloat
-	infoTrajeto.QtdTrajetos += 1
+	fmt.Println("Informações do usuário obtidas")
 
-	//Encapsulando informações em formato JSON
-	trajetoAsBytesFinal, _ := json.Marshal(infoTrajeto)
+	//Convertendo as informações do usuário em um objeto
+	usuario := Usuario{}
+	json.Unmarshal(UsuarioAsBytes, &usuario)
 
-	//Inserindo informações no Ledger
-	stub.PutState((userPlaca + strconv.Itoa(infoTrajeto.QtdTrajetos)), trajetoAsBytesFinal)
+	//Criar assinatura do trajeto
+	trajeto.TrajetoHash = cdgUnico
+	trajeto.TrajetoDistancia = distFloat
+
+	//Associar trajeto com o usuário
+	trajetoUsuario.Viagem = trajeto.TrajetoHash + "-" + usuario.Placa
+	trajetoUsuario.IdPlaca = usuario.Placa
+	trajetoUsuario.idTrajeto = trajeto.TrajetoHash
+	distOld := trajeto.TrajetoDistancia
+	trajetoUsuario.TrajetoAcumulado += distOld
+
+	//Encapsulando dados em arquivo JSON
+	TrajetoAsBytes, _ := json.Marshal(trajeto)
+	UsuarioTrajetoAsBytes, _ := json.Marshal(trajetoUsuario)
+
+	stub.PutState(trajeto.TrajetoHash, TrajetoAsBytes)
+	stub.PutState(trajetoUsuario.Viagem, UsuarioTrajetoAsBytes)
 
 	return shim.Success(nil)
 }
