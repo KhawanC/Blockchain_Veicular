@@ -66,10 +66,16 @@ type Trajeto struct {
 }
 
 type TrajetoUsuario struct {
-	Viagem           string  `json:"Viagem"`      // PK
-	IdPlaca          string  `json:"IdPlaca"`     //FK (Usuario)
-	idTrajeto        string  `json:"TrajetoHash"` //FK (Trajeto)
-	TrajetoAcumulado float64 `json:"TrajetoAcumulador"`
+	Viagem    string `json:"Viagem"`      // PK
+	IdPlaca   string `json:"IdPlaca"`     //FK (Usuario)
+	idTrajeto string `json:"TrajetoHash"` //FK (Trajeto)
+}
+
+type ContadorViagens struct {
+	ContadorVeiculo     string  `json:"ContadorVeiculo"`
+	UltimaViagem        string  `json:"UltimaViagem"`
+	AcumuladorDistancia float64 `json:"AcumuladorDistancia"`
+	qtdViagens          int     `json:"qtdViagens"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -183,6 +189,7 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	if err != nil || UsuarioAsBytes == nil {
 
 		usuario := Usuario{}
+		contador := ContadorViagens{}
 
 		fmt.Println("Usuário não encontrado")
 
@@ -193,25 +200,31 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 		trajeto.TrajetoHash = cdgUnico
 		trajeto.TrajetoDistancia = distFloat
 
-		//Associar trajeto com o usuário
+		//Associar trajeto com o usuário, criando assim um log para cada viagem
 		trajetoUsuario.Viagem = trajeto.TrajetoHash + "-" + usuario.Placa
 		trajetoUsuario.IdPlaca = usuario.Placa
 		trajetoUsuario.idTrajeto = trajeto.TrajetoHash
-		distOld := trajeto.TrajetoDistancia
-		trajetoUsuario.TrajetoAcumulado += distOld
+
+		//Criar registro geral de veiagens do veiculo
+		contador.ContadorVeiculo = usuario.Placa + "-Contador"
+		contador.UltimaViagem = trajetoUsuario.Viagem
+		contador.AcumuladorDistancia = trajeto.TrajetoDistancia
+		contador.qtdViagens = 1
 
 		//Encapsulando dados em arquivo JSON
 		UsuarioAsBytesFinal, _ := json.Marshal(usuario)
 		TrajetoAsBytes, _ := json.Marshal(trajeto)
 		UsuarioTrajetoAsBytes, _ := json.Marshal(trajetoUsuario)
+		ContadorViagensAsBytes, _ := json.Marshal(contador)
 
 		//Enviando informações para o Ledger
 		stub.PutState(usuario.Placa, UsuarioAsBytesFinal)
 		stub.PutState(trajeto.TrajetoHash, TrajetoAsBytes)
 		stub.PutState(trajetoUsuario.Viagem, UsuarioTrajetoAsBytes)
+		stub.PutState(contador.ContadorVeiculo, ContadorViagensAsBytes)
 
 		fmt.Println("Dados registrados com sucesso")
-		shim.Success(nil)
+		return shim.Success(nil)
 	}
 
 	fmt.Println("Informações do usuário obtidas")
@@ -228,13 +241,53 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	trajetoUsuario.Viagem = trajeto.TrajetoHash + "-" + usuario.Placa
 	trajetoUsuario.IdPlaca = usuario.Placa
 	trajetoUsuario.idTrajeto = trajeto.TrajetoHash
-	distOld := trajeto.TrajetoDistancia
-	trajetoUsuario.TrajetoAcumulado += distOld
+
+	//Recuperando Contador de Viagens
+	fk := usuario.Placa + "-Contador"
+	ContadorViagensAsBytes, err := stub.GetState(fk)
+
+	//Caso contador não exista
+	if err != nil || ContadorViagensAsBytes == nil {
+		contador := ContadorViagens{}
+
+		//Criar registro geral de veiagens do veiculo
+		contador.ContadorVeiculo = usuario.Placa + "-Contador"
+		contador.UltimaViagem = trajetoUsuario.Viagem
+		contador.AcumuladorDistancia = trajeto.TrajetoDistancia
+		contador.qtdViagens = 1
+
+		//Encapsular informação em
+		ContadorViagensAsBytesFinal, _ := json.Marshal(contador)
+
+		//Enviar informações para o ledger
+		stub.PutState(contador.ContadorVeiculo, ContadorViagensAsBytesFinal)
+
+	} else { //Caso exista
+
+		//Criando Struct do contador
+		contador := ContadorViagens{}
+
+		//Inserindo informações obtidas em bytes no Struct do contador
+		json.Unmarshal(ContadorViagensAsBytes, &contador)
+
+		//Atualizando valores com a nova viagem
+		contador.UltimaViagem = trajetoUsuario.Viagem
+		contador.AcumuladorDistancia += trajeto.TrajetoDistancia
+		contador.qtdViagens += 1
+
+		//Encapsulando dados em arquivo JSON
+		ContadorViagensAsBytesFinal, _ := json.Marshal(contador)
+
+		//Inserindo no Ledger
+		stub.PutState(contador.ContadorVeiculo, ContadorViagensAsBytesFinal)
+
+	}
 
 	//Encapsulando dados em arquivo JSON
 	TrajetoAsBytes, _ := json.Marshal(trajeto)
 	UsuarioTrajetoAsBytes, _ := json.Marshal(trajetoUsuario)
 
+	//Inserindo valor no Ledger
 	stub.PutState(trajeto.TrajetoHash, TrajetoAsBytes)
 	stub.PutState(trajetoUsuario.Viagem, UsuarioTrajetoAsBytes)
 
