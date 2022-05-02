@@ -46,7 +46,7 @@ if __name__ == "__main__":
         randNum1 = random.randint(0, len(nums))
         if(randNum1 == 10):
             randNum1 -= 1
-            placa.append(str(nums[randNum1]))
+        placa.append(str(nums[randNum1]))
 
         #Criando mais uma letra de forma aleatória
         randLetra2 = random.randint(0, len(letras))
