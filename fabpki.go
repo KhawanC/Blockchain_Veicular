@@ -46,19 +46,20 @@ func Encode(msg string) string {
 type SmartContract struct {
 }
 
-type Veiculo struct {
-	CdgVeiculo string `json:"CdgVeiculo"` // PK
-	Categoria  string `json:"Categoria"`
-	Marca      string `json:"Marca"`
-	Versao     string `json:"Versao"`
-	Modelo     string `json:"Modelo"`
-	EmissaoPad string `json:"EmissaoPad"`
+type Categoria struct {
+	CdgCategoria string  `json:"CdgCategoria"` // PK
+	Categoria    string  `json:"Categoria"`
+	Marca        string  `json:"Marca"`
+	Versao       string  `json:"Versao"`
+	Modelo       string  `json:"Modelo"`
+	EmissaoPad   float64 `json:"EmissaoPad"`
 }
 
 type Usuario struct {
-	Placa               string  `json:"Placa"`        // PK
-	IdCdgVeiculo        string  `json:"IdCdgVeiculo"` //FK (Veiculo)
+	Placa               string  `json:"Placa"`          // PK
+	IdCdgCategoria      string  `json:"IdCdgCategoria"` //FK (Categoria)
 	AcumuladorDistancia float64 `json:"AcumuladorDistancia"`
+	Co2_Emitido         float64 `json:"Co2_Emitido"`
 	CreditosDeCarbono   float64 `json:"CreditosDeCarbono"`
 	QtdViagens          float64 `json:"qtdViagens"`
 }
@@ -72,6 +73,15 @@ type TrajetoUsuario struct {
 	Viagem    string `json:"Viagem"`      // PK
 	IdPlaca   string `json:"IdPlaca"`     //FK (Usuario)
 	IdTrajeto string `json:"TrajetoHash"` //FK (Trajeto)
+}
+
+type Token struct {
+	Credito_Token string  `json:"Credito_Token"` //PK
+	Co2_eq        float64 `json:"Co2_eq"`
+	Volume_Total  float64 `json:"Volume_Total"`
+}
+
+type Metas struct {
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -89,12 +99,15 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 
 	} else if fn == "registrarTrajeto" {
 		return s.registrarTrajeto(stub, args)
+
+	} else if fn == "calcularMeta" {
+		return s.calcularMeta(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
 }
 
-//Função que recebe bancoLedger.py e inserer o banco de dados com os veículos
+//Função que recebe ./bancoLedger.py e inserer o banco de dados com os veículos
 func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	//Verificando se a quantidade de argumnetos é maior que 6
@@ -110,21 +123,36 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	modelo := args[4]
 	emissao := args[5]
 
-	//Inserindo argumentos dentro da Struct Veiculo
-	var veiculoInfor = Veiculo{
-		Categoria:  categoria,
-		Marca:      marca,
-		Versao:     versao,
-		Modelo:     modelo,
-		EmissaoPad: emissao,
-		CdgVeiculo: codigo,
+	//Converter emissão padrão para Float64 pois ela veio como String
+	emissFloat, err := strconv.ParseFloat(emissao, 64)
+	if err != nil {
+		return shim.Error("Erro ao converter distância do usuário")
 	}
 
-	//Encapsulando as informações do veículo em formato JSON
-	veiculoAsBytes, _ := json.Marshal(veiculoInfor)
+	//Criando o token
+	var credito = Token{
+		Credito_Token: "Credito_Token",
+		Co2_eq:        0.0,
+		Volume_Total:  0.0,
+	}
+
+	//Inserindo argumentos dentro da Struct Categoria
+	var CategoriaInfor = Categoria{
+		Categoria:    categoria,
+		Marca:        marca,
+		Versao:       versao,
+		Modelo:       modelo,
+		EmissaoPad:   emissFloat,
+		CdgCategoria: codigo,
+	}
+
+	//Encapsulando as informações em arquivo JSON
+	CategoriaAsBytes, _ := json.Marshal(CategoriaInfor)
+	tokenAsBytes, _ := json.Marshal(credito)
 
 	//Inserindo valores no ledger, com uma informação associada à uma chave
-	stub.PutState(codigo, veiculoAsBytes)
+	stub.PutState(codigo, CategoriaAsBytes)
+	stub.PutState(credito.Credito_Token, tokenAsBytes)
 
 	//Confirmação do chaincode
 	fmt.Println("Registrando seu banco de veiculos...")
@@ -139,12 +167,12 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 		return shim.Error("Eram esperados 2 argumentos... Tente novamente!")
 	}
 	userPlaca := args[0]
-	cdgVeiculoUser := args[1]
+	cdgCategoriaUser := args[1]
 
 	//Criar Struct para manipular as informações do veículo
 	userVeiculo := Usuario{
 		Placa:               userPlaca,
-		IdCdgVeiculo:        cdgVeiculoUser,
+		IdCdgCategoria:      cdgCategoriaUser,
 		AcumuladorDistancia: 0.0,
 		QtdViagens:          0.0,
 	}
@@ -218,6 +246,57 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	stub.PutState(usuario.Placa, UsuarioAsBytesFinal)
 	stub.PutState(trajeto.TrajetoHash, TrajetoAsBytes)
 	stub.PutState(trajetoUsuario.Viagem, UsuarioTrajetoAsBytes)
+
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) calcularMeta(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+	if len(args) != 1 {
+		return shim.Error("O argumeto esperado não foi encontrado")
+	}
+
+	//Dar nome ao argumento
+	userPlaca := args[0]
+
+	//Verificar se a placa existe no Ledger
+	UsuarioAsBytes, err := stub.GetState(userPlaca)
+
+	//OBS: ela tem que existir, esse erro nem sentido faz
+	if err != nil || UsuarioAsBytes == nil {
+		return shim.Error("Sua placa não existe")
+	}
+
+	//Resgatar token
+	tokenAsBytes, err := stub.GetState("Credito_Token")
+
+	//Mais um erro que não faz sentido verificar
+	if err != nil || UsuarioAsBytes == nil {
+		return shim.Error("Sua placa não existe")
+	}
+
+	//Convertendo as informações para objeto
+	usuario := Usuario{}
+	json.Unmarshal(UsuarioAsBytes, &usuario)
+
+	token := Token{}
+	json.Unmarshal(tokenAsBytes, &token)
+
+	//Resgatar Categoria
+	categoriaAsBytes, err := stub.GetState(usuario.IdCdgCategoria)
+
+	//Mais um erro que não faz sentido
+	if err != nil || UsuarioAsBytes == nil {
+		return shim.Error("Sua placa não existe")
+	}
+
+	//Cnvertendo as informações da categoria em objeto
+	categoria := Categoria{}
+	json.Unmarshal(categoriaAsBytes, &categoria)
+
+	//Começando calculos de emissão
+	usuario.Co2_Emitido = usuario.AcumuladorDistancia * categoria.EmissaoPad
+
+	fmt.Println("Informações do usuário obtidas")
 
 	return shim.Success(nil)
 }

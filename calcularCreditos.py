@@ -1,14 +1,41 @@
-import json
+import random, json
+from hfc.fabric import Client as client_fabric
+import asyncio
 
-mediaEmissao = 0
+domain = "ptb.de"
+channel_name = "nmi-channel"
+cc_name = "fabpki"
+cc_version = "1.0"
 
-with open('../fabpki-cli/dadosVeicularesAtualizados.json', 'r', encoding='utf-8') as arq:
-    banco_json = json.loads(arq.read())
+if __name__ == "__main__":
 
-for i in banco_json["Veiculo"]:
-    if banco_json["Veiculo"][i]["Categoria"] == "Compacto":
-        mediaEmissao += (banco_json["Veiculo"][i]["Emissao"]*1.3)
-    if banco_json["Veiculo"][i]["Categoria"] == "Medio":
-        mediaEmissao += (banco_json["Veiculo"][i]["Emissao"]*1.6)
+    #Ler arquivo json e coloca-lo em uma variavel chamada "info"
+    with open('dadosVeicularesAtualizados.json', 'r', encoding='utf-8') as arq_r:
+        info = json.loads(arq_r.read())
+    
+    #Variavel que armazenará a quantidade de placas dentro do arquivo json
+    qtd_veiculos_json = len(info["Placas"])
 
-print(mediaEmissao * 30)
+    loop = asyncio.get_event_loop()
+
+    c_hlf = client_fabric(net_profile=(domain + ".json"))
+
+    admin = c_hlf.get_user(domain, 'Admin')
+    callpeer = "peer0." + domain
+
+    c_hlf.new_channel(channel_name)
+    
+    #Fazer um loop para cada veiculo, associando um trajeto entre 0 e 80 para eles
+    for i in range(qtd_veiculos_json):
+        placa = info["Placas"][str(i)]
+        response = loop.run_until_complete(c_hlf.chaincode_invoke(
+            requestor=admin,
+            channel_name=channel_name,
+            peers=[callpeer],
+            cc_name=cc_name,
+            cc_version=cc_version,
+            fcn='registrarTrajeto',
+            args=[placa],
+            cc_pattern=None))
+    
+    print("Trajeto de veiculos registrado com sucesso")
