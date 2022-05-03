@@ -31,7 +31,7 @@ if __name__ == "__main__":
     #Loop para criar 20 placas
     for i in range(0, 20):
         
-        #Criar uma lista para inserir as letras no padrão Mercosul (AAA1A11)
+        #Criar uma lista para inserir as letras/numeros no padrão Mercosul (AAA1A11)
         placa = []
 
         #Criando as primeiras 3 letras aleatóriamente
@@ -80,9 +80,9 @@ if __name__ == "__main__":
     c_hlf.new_channel(channel_name)
 
     for i in range(len(bancoPlacas)):
-        valor = random.randint(0, len(banco_json["Veiculo"]) - 1)
+        valor = random.randint(0, len(banco_json["Modelo_Veiculos"]) - 1)
         contador2 = 0
-        for cdg in banco_json["Veiculo"]:
+        for cdg in banco_json["Modelo_Veiculos"]:
             if valor == contador2:
                 cdgUsuario = cdg
             contador2 += 1
@@ -95,5 +95,16 @@ if __name__ == "__main__":
             fcn='registrarUsuario',
             args=[bancoPlacas[i], cdgUsuario],
             cc_pattern=None))
+        
+    qtd_veiculos_json = len(banco_json["Placas"])
 
+    for i in range(len(bancoPlacas)):
+        banco_json["Placas"][qtd_veiculos_json] = bancoPlacas[i]
+        qtd_veiculos_json = len(banco_json["Placas"])
+
+    data = json.dumps(banco_json, indent=2)
+    
+    with open('dadosVeicularesAtualizados.json', 'w', encoding='utf-8') as arq_w:
+        arq_w.write(data)
+        
     print("Veiculo registrado com sucesso !")

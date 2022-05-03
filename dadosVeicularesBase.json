@@ -1,5 +1,5 @@
 {
-    "Veiculo":{
+    "Modelo_Veiculos":{
        "CVKWGOLPAT112":{
           "Categoria":"Compacto",
           "Marca":"VW",
@@ -84,5 +84,8 @@
           "Modelo":"3LT",
           "Emissao":88
        }
+    },
+    "Placas":{
+       
     }
  }

@@ -18,9 +18,9 @@ if __name__ == "__main__":
         arq_json = json.load(f)
 
     # Atualizar todas as emissões dentro do arq_json com base no cálculo de distribuição normal
-    for i in arq_json["Veiculo"]:
-        arq_json["Veiculo"][i]["Emissao"] = gauss(
-            arq_json["Veiculo"][i]["Emissao"], 10)
+    for i in arq_json["Modelo_Veiculos"]:
+        arq_json["Modelo_Veiculos"][i]["Emissao"] = gauss(
+            arq_json["Modelo_Veiculos"][i]["Emissao"], 10)
 
     print("Dados de emissão atualizados")
 
@@ -37,12 +37,12 @@ if __name__ == "__main__":
 
     c_hlf.new_channel(channel_name)
 
-    for idVeiculo in arq_json["Veiculo"]:
-        categoria = arq_json["Veiculo"][idVeiculo]["Categoria"]
-        marca = arq_json["Veiculo"][idVeiculo]["Marca"]
-        versao = arq_json["Veiculo"][idVeiculo]["Versao"]
-        modelo = arq_json["Veiculo"][idVeiculo]["Modelo"]
-        emissao = arq_json["Veiculo"][idVeiculo]["Emissao"]
+    for idVeiculo in arq_json["Modelo_Veiculos"]:
+        categoria = arq_json["Modelo_Veiculos"][idVeiculo]["Categoria"]
+        marca = arq_json["Modelo_Veiculos"][idVeiculo]["Marca"]
+        versao = arq_json["Modelo_Veiculos"][idVeiculo]["Versao"]
+        modelo = arq_json["Modelo_Veiculos"][idVeiculo]["Modelo"]
+        emissao = arq_json["Modelo_Veiculos"][idVeiculo]["Emissao"]
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,
