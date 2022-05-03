@@ -79,12 +79,17 @@ if __name__ == "__main__":
 
     c_hlf.new_channel(channel_name)
 
+    #Loop para enviar ao chaincode cada placa 
     for i in range(len(bancoPlacas)):
+        #Criando um numero aleatório para ser associado ao index de categorias do arquivo json
         valor = random.randint(0, len(banco_json["Modelo_Veiculos"]) - 1)
         contador2 = 0
+        #Criando um loop para pegar todos os códigos de veiculo do arquivo json
         for cdg in banco_json["Modelo_Veiculos"]:
+            #Quando o index aleatório for referente a sua representação do seu código no json uma nova
+            #variavel é criada para armazenar esse código
             if valor == contador2:
-                cdgUsuario = cdg
+                cdgVeiculo = cdg
             contador2 += 1
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
@@ -93,17 +98,21 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarUsuario',
-            args=[bancoPlacas[i], cdgUsuario],
+            args=[bancoPlacas[i], cdgVeiculo],
             cc_pattern=None))
-        
+    
+    #Loop que armazena a quantidade de placas criadas pelo loop anterior
     qtd_veiculos_json = len(banco_json["Placas"])
 
+    #Armazenado todas as placas no arquivo json para manipulação posterior
     for i in range(len(bancoPlacas)):
         banco_json["Placas"][qtd_veiculos_json] = bancoPlacas[i]
         qtd_veiculos_json = len(banco_json["Placas"])
 
+    #Encapsulando valor em uma variavel do tipo string, formatada
     data = json.dumps(banco_json, indent=2)
     
+    #Salvando arquivo json com novos valores
     with open('dadosVeicularesAtualizados.json', 'w', encoding='utf-8') as arq_w:
         arq_w.write(data)
         
