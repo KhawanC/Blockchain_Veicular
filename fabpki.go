@@ -61,7 +61,7 @@ type Usuario struct {
 	AcumuladorDistancia float64 `json:"AcumuladorDistancia"`
 	Co2_Emitido         float64 `json:"Co2_Emitido"`
 	CreditosDeCarbono   float64 `json:"CreditosDeCarbono"`
-	QtdViagens          float64 `json:"qtdViagens"`
+	MetaDeEmissao       float64 `json:"MetaDeEmissao"`
 }
 
 type Trajeto struct {
@@ -76,12 +76,10 @@ type TrajetoUsuario struct {
 }
 
 type Token struct {
-	Credito_Token string  `json:"Credito_Token"` //PK
-	Co2_eq        float64 `json:"Co2_eq"`
-	Volume_Total  float64 `json:"Volume_Total"`
-}
-
-type Metas struct {
+	Credito_Token        string  `json:"Credito_Token"` //PK
+	Co2_eq               float64 `json:"Co2_eq"`
+	Volume_Total_Inicial float64 `json:"Volume_Total"`
+	Volume_Total         float64 `json:"Volume"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -131,9 +129,10 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 
 	//Criando o token
 	var credito = Token{
-		Credito_Token: "Credito_Token",
-		Co2_eq:        0.0,
-		Volume_Total:  0.0,
+		Credito_Token:        "Credito_Token",
+		Co2_eq:               1.0,
+		Volume_Total:         0.0,
+		Volume_Total_Inicial: 0.0,
 	}
 
 	//Inserindo argumentos dentro da Struct Categoria
@@ -174,7 +173,7 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 		Placa:               userPlaca,
 		IdCdgCategoria:      cdgCategoriaUser,
 		AcumuladorDistancia: 0.0,
-		QtdViagens:          0.0,
+		MetaDeEmissao:       3500.0,
 	}
 
 	veiculoAsBytes, _ := json.Marshal(userVeiculo)
@@ -225,8 +224,6 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	//Atualizando dados de trajeto do usuario
 	trajetoOld := usuario.AcumuladorDistancia
 	usuario.AcumuladorDistancia = trajetoOld + distFloat
-	viagensOld := usuario.QtdViagens
-	usuario.QtdViagens = viagensOld + 1.0
 
 	//Criar assinatura do trajeto
 	trajeto.TrajetoHash = cdgUnico
@@ -294,9 +291,19 @@ func (s *SmartContract) calcularMeta(stub shim.ChaincodeStubInterface, args []st
 	json.Unmarshal(categoriaAsBytes, &categoria)
 
 	//Começando calculos de emissão
-	usuario.Co2_Emitido = usuario.AcumuladorDistancia * categoria.EmissaoPad
+	usuario.Co2_Emitido = usuario.AcumuladorDistancia * categoria.EmissaoPad // <-- calcular a emissão do usuaŕio pelo produto entre a emissão da sua categoria e sua distância acumulada
+	usuario.Co2_Emitido -= usuario.MetaDeEmissao                             // <-- Pegar o valor anterior e subtrair da sua meta
 
-	fmt.Println("Informações do usuário obtidas")
+	//Ataulizar a emissão total do
+	token.Volume_Total_Inicial += usuario.AcumuladorDistancia * categoria.EmissaoPad
+
+	//Encapsulando dados em arquivo JSON
+	UsuarioAsBytesFinal, _ := json.Marshal(usuario)
+	TokenAsBytesFinal, _ := json.Marshal(token)
+
+	//Inserindo valor no Ledger
+	stub.PutState(usuario.Placa, UsuarioAsBytesFinal)
+	stub.PutState(token.Credito_Token, TokenAsBytesFinal)
 
 	return shim.Success(nil)
 }
