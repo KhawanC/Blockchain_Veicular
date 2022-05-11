@@ -1,4 +1,4 @@
-import random, json
+import json
 from hfc.fabric import Client as client_fabric
 import asyncio
 
@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     c_hlf.new_channel(channel_name)
     
-    #Fazer um loop para cada veiculo, associando um trajeto entre 0 e 80 para eles
+    #Fazer um loop para enviar as placas do json ao smart contract
     for i in range(qtd_veiculos_json):
         placa = info["Placas"][str(i)]
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
@@ -34,8 +34,20 @@ if __name__ == "__main__":
             peers=[callpeer],
             cc_name=cc_name,
             cc_version=cc_version,
-            fcn='registrarTrajeto',
+            fcn='calcularEmissao',
             args=[placa],
             cc_pattern=None))
     
-    print("Trajeto de veiculos registrado com sucesso")
+    for i in range(qtd_veiculos_json):
+        placa = info["Placas"][str(i)]
+        response = loop.run_until_complete(c_hlf.chaincode_invoke(
+            requestor=admin,
+            channel_name=channel_name,
+            peers=[callpeer],
+            cc_name=cc_name,
+            cc_version=cc_version,
+            fcn='calcularCreditos',
+            args=[placa],
+            cc_pattern=None))
+    
+    print("Calculos de créditos de carbono efetuados com sucesso")

@@ -12,7 +12,7 @@ import (
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 
 type Contador struct {
-	Contador int
+	ips []int
 }
 
 func AleatString(n int) string {

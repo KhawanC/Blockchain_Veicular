@@ -28,7 +28,7 @@ if __name__ == "__main__":
     #Fazer um loop para cada veiculo, associando um trajeto entre 0 e 80 para eles
     for i in range(qtd_veiculos_json):
         placa = info["Placas"][str(i)]
-        distancia = random.randint(0,80)
+        distancia = random.randint(0,120)
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,

@@ -1,0 +1,130 @@
+{
+    "Modelo_Veiculos": {
+      "CVKWGOLPAT112": {
+        "Categoria": "Compacto",
+        "Marca": "VW",
+        "Versao": "GOL",
+        "Modelo": "PATRULHEIRO",
+        "Emissao": 99.00822396055601
+      },
+      "CHYDHB2VIS97": {
+        "Categoria": "Compacto",
+        "Marca": "Hyundai",
+        "Versao": "HB20",
+        "Modelo": "Vision21/22",
+        "Emissao": 85.19138068246748
+      },
+      "CTYTETHXST100": {
+        "Categoria": "Compacto",
+        "Marca": "Toyota",
+        "Versao": "Etios Hatback",
+        "Modelo": "XSTD",
+        "Emissao": 125.24153922967189
+      },
+      "CFRDKAHSEE92": {
+        "Categoria": "Compacto",
+        "Marca": "Ford",
+        "Versao": "Ka Hatch",
+        "Modelo": "SE",
+        "Emissao": 88.08895854650582
+      },
+      "CMNICPR5PP105": {
+        "Categoria": "Compacto",
+        "Marca": "MINI",
+        "Versao": "Cooper",
+        "Modelo": "5P",
+        "Emissao": 92.68421308502965
+      },
+      "CRNTSDRLFE97": {
+        "Categoria": "Compacto",
+        "Marca": "Renault",
+        "Versao": "Sandero",
+        "Modelo": "Life",
+        "Emissao": 92.091451780785
+      },
+      "MRNTLOGZEN107": {
+        "Categoria": "Medio",
+        "Marca": "Renault",
+        "Versao": "Logan",
+        "Modelo": "Zen",
+        "Emissao": 106.46459522004723
+      },
+      "MHNDCTYEXX101": {
+        "Categoria": "Medio",
+        "Marca": "Honda",
+        "Versao": "City",
+        "Modelo": "EX",
+        "Emissao": 88.98312860658375
+      },
+      "MTYTETSXST98": {
+        "Categoria": "Medio",
+        "Marca": "Toyota",
+        "Versao": "Etius Seda",
+        "Modelo": "XSTD",
+        "Emissao": 99.24606484589131
+      },
+      "MNSNVDR16M99": {
+        "Categoria": "Medio",
+        "Marca": "NIISAN",
+        "Versao": "V-DRIVE",
+        "Modelo": "16 MT",
+        "Emissao": 123.93502117358341
+      },
+      "MKIARIOEXF115": {
+        "Categoria": "Medio",
+        "Marca": "KIA",
+        "Versao": "RIO",
+        "Modelo": "EX 1.6 FF AT HB",
+        "Emissao": 123.65375761413065
+      },
+      "MCVLOXP3LT88": {
+        "Categoria": "Medio",
+        "Marca": "CHEVROLET",
+        "Versao": "ONIX PLUS",
+        "Modelo": "3LT",
+        "Emissao": 105.0366421637909
+      }
+    },
+    "Placas": {
+      "0": "ZCS9K31",
+      "1": "HIZ9G99",
+      "2": "PUO3Z51",
+      "3": "JJM3K16",
+      "4": "TXZ7L76",
+      "5": "GXK2W46",
+      "6": "CHQ1D51",
+      "7": "MBH2L07",
+      "8": "PTI8Z87",
+      "9": "UXA9O15",
+      "10": "EAI0V72",
+      "11": "IYY0I15",
+      "12": "ITC2P12",
+      "13": "IJQ2L78",
+      "14": "YIW1H57",
+      "15": "PQO9J09",
+      "16": "ZCR6A49",
+      "17": "XZT2X84",
+      "18": "UHC9C95",
+      "19": "KYO1I49",
+      "20": "ZQW9X80",
+      "21": "CFD2U44",
+      "22": "ZIZ3Z20",
+      "23": "LUW7K60",
+      "24": "EPW2I29",
+      "25": "GED3Z88",
+      "26": "ZMR5Q69",
+      "27": "WCK3O39",
+      "28": "OQN9W81",
+      "29": "ENG9T99",
+      "30": "EAA0M64",
+      "31": "WDZ2I90",
+      "32": "ECQ9P21",
+      "33": "UIC1Q05",
+      "34": "ZBO9C62",
+      "35": "POV0X26",
+      "36": "TLE2R89",
+      "37": "FLS7I53",
+      "38": "IAW9X85",
+      "39": "JVA3K71"
+    }
+  }
