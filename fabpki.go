@@ -61,7 +61,6 @@ type Usuario struct {
 	AcumuladorDistancia string `json:"AcumuladorDistancia"`
 	Co2Emitido          string `json:"Co2Emitido"`
 	CreditosDeCarbono   string `json:"CreditosDeCarbono"`
-	MetaDeEmissao       string `json:"MetaDeEmissao"`
 }
 
 type Trajeto struct {
@@ -76,9 +75,8 @@ type TrajetoUsuario struct {
 }
 
 type Token struct {
-	CreditoToken string `json:"CreditoToken"` //PK
-	Co2eq        string `json:"Co2Eq"`
-	VolumeTotal  string `json:"VolumeTotal"`
+	CreditoToken  string `json:"CreditoToken"` //PK
+	MetaDeEmissao string `json:"MetaDeEmissao"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -127,8 +125,6 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	//Criando o token
 	var credito = Token{
 		CreditoToken: "Credito_Token",
-		Co2eq:        "1.0",
-		VolumeTotal:  "0.0",
 	}
 
 	//Inserindo argumentos dentro da Struct Categoria
@@ -173,7 +169,6 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 		Placa:               userPlaca,
 		IdCdgCategoria:      cdgCategoriaUser,
 		AcumuladorDistancia: "0.0",
-		MetaDeEmissao:       "50000.0",
 		Co2Emitido:          "0.0",
 		CreditosDeCarbono:   "0.0",
 	}
@@ -331,6 +326,39 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 // 	return shim.Success(nil)
 // }
 
+func (s *SmartContract) calcularMeta(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+	if len(args) != 1 {
+		return shim.Error("O argumeto esperado não foi encontrado")
+	}
+
+	mediaEmissPad := args[0]
+	mediaTrajetos := args[1]
+
+	tokenAsBytes, err := stub.GetState("Credito_Token")
+	if err != nil {
+		return shim.Error("Nao foi possível recuperar o token da rede")
+	}
+
+	token := Token{}
+
+	//Convertendo os valores de String para Float
+	mediaEmissFloat, err2 := strconv.ParseFloat(mediaEmissPad, 64)
+	mediaTrajetoFloat, err2 := strconv.ParseFloat(mediaTrajetos, 64)
+
+	if err2 != nil {
+		return shim.Error("Nao foi possível converter algum dos valores de String para Float")
+	}
+
+	metaDeEmissFloat := (mediaEmissFloat * mediaTrajetoFloat)
+	metaDeEmissaoString := fmt.Sprintf("%.2f", metaDeEmissFloat)
+	token.MetaDeEmissao = metaDeEmissaoString
+
+	tokenAsBytes, _ = json.Marshal(token)
+	stub.PutState("Credito_Token", tokenAsBytes)
+
+	return shim.Success(nil)
+}
+
 func (s *SmartContract) calcularCreditos(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
@@ -339,6 +367,14 @@ func (s *SmartContract) calcularCreditos(stub shim.ChaincodeStubInterface, args 
 
 	fmt.Println("Iniciando calculo de créditos")
 	placa := args[0]
+
+	tokenAsBytes, err := stub.GetState("Credito_Token")
+	if err != nil {
+		return shim.Error("Nao foi possível recuperar o token da rede")
+	}
+
+	token := Token{}
+	json.Unmarshal(tokenAsBytes, &token)
 
 	userAsBytes, err1 := stub.GetState(placa)
 	if err1 != nil || userAsBytes == nil {
@@ -369,6 +405,9 @@ func (s *SmartContract) calcularCreditos(stub shim.ChaincodeStubInterface, args 
 
 	usuario.Co2Emitido = "0.0"
 
+	//Converter Meta de Emissão do Token
+	metaEmissToken, err := strconv.ParseFloat(token.MetaDeEmissao, 64)
+
 	//Converter emissao padrão da categoria de String para Float
 	emissPadFLoat, err := strconv.ParseFloat(categoria.EmissaoPad, 64)
 
@@ -379,14 +418,11 @@ func (s *SmartContract) calcularCreditos(stub shim.ChaincodeStubInterface, args 
 	co2EmitidoString := fmt.Sprintf("%.2f", co2EmitidoFloat)
 	usuario.Co2Emitido = co2EmitidoString
 
-	//Converter a meta de emissao de String para Float
-	metaFLoat, err := strconv.ParseFloat(usuario.MetaDeEmissao, 64)
-
 	//Converter creditos já existentes para FLoat
 	creditosOld, err := strconv.ParseFloat(usuario.CreditosDeCarbono, 64)
 
 	//Calcular créditos, zerar valor de emissão
-	creditos := metaFLoat - co2EmitidoFloat
+	creditos := metaEmissToken - co2EmitidoFloat
 	creditosNew := creditosOld + creditos
 
 	creditosString := fmt.Sprintf("%.2f", creditosNew)
