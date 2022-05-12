@@ -1,14 +1,8 @@
-import json
-import random
+import pyautogui, socket, time
 
-placas = ['abc1d23', 'dcb3a21', 'abc1234']
+sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sk.connect(("8.8.8.8", 80))
 
-with open('dadosVeicularesAtualizados.json', 'r', encoding='utf-8') as arq_r:
-    info = json.loads(arq_r.read())
-    
-qtd_veiculos_json = len(info["Placas"])
-
-for i in range(qtd_veiculos_json):
-    placa = info["Placas"][str(i)]
-    print(placa)
-        
+pyautogui.hotkey('ctrl', 'shift', 't')
+time.sleep(0.5)
+pyautogui.write(sk.getsockname()[0])
