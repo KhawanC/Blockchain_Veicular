@@ -24,27 +24,14 @@ if __name__ == "__main__":
     callpeer = "peer0." + domain
 
     c_hlf.new_channel(channel_name)
-    
-    #Fazer um loop para enviar as placas do json ao smart contract
+        
     for i in range(qtd_veiculos_json):
         placa = info["Placas"][str(i)]
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,
             peers=[callpeer],
-            cc_name=cc_name,
-            cc_version=cc_version,
-            fcn='calcularEmissao',
-            args=[placa],
-            cc_pattern=None))
-    
-    for i in range(qtd_veiculos_json):
-        placa = info["Placas"][str(i)]
-        response = loop.run_until_complete(c_hlf.chaincode_invoke(
-            requestor=admin,
-            channel_name=channel_name,
-            peers=[callpeer],
-            cc_name=cc_name,
+            cc_name=cc_name,    
             cc_version=cc_version,
             fcn='calcularCreditos',
             args=[placa],

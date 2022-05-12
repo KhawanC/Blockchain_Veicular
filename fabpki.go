@@ -97,9 +97,6 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 	} else if fn == "registrarTrajeto" {
 		return s.registrarTrajeto(stub, args)
 
-	} else if fn == "calcularMeta" {
-		return s.calcularEmissao(stub, args)
-
 	} else if fn == "calcularCreditos" {
 		return s.calcularCreditos(stub, args)
 	}
@@ -176,7 +173,7 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 		Placa:               userPlaca,
 		IdCdgCategoria:      cdgCategoriaUser,
 		AcumuladorDistancia: "0.0",
-		MetaDeEmissao:       "2000.0",
+		MetaDeEmissao:       "50000.0",
 		Co2Emitido:          "0.0",
 		CreditosDeCarbono:   "0.0",
 	}
@@ -254,11 +251,93 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	return shim.Success(nil)
 }
 
-func (s *SmartContract) calcularEmissao(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+// func (s *SmartContract) calcularEmissao(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+// 	if len(args) != 1 {
+// 		return shim.Error("O argumeto esperado não foi encontrado")
+// 	}
+
+// 	placa := args[0]
+
+// 	fmt.Println("Iniciando calculo de emissao")
+
+// 	userAsBytes, err1 := stub.GetState(placa)
+// 	if err1 != nil || userAsBytes == nil {
+// 		return shim.Error("Nao foi possível recuperar o seu veículo no sistema")
+// 	}
+
+// 	usuario := Usuario{}
+// 	json.Unmarshal(userAsBytes, &usuario)
+
+// 	fmt.Println("Sua placa é: " + usuario.Placa)
+
+// 	categoriaAsBytes, err2 := stub.GetState(usuario.IdCdgCategoria)
+// 	if err2 != nil || categoriaAsBytes == nil {
+// 		return shim.Error("Não foi possível recuperar as informações da categoria")
+// 	}
+
+// 	categoria := Categoria{}
+// 	json.Unmarshal(categoriaAsBytes, &categoria)
+
+// 	fmt.Println("Esse veículo é um " + categoria.Marca)
+
+// 	// tokenAsBytes, err3 := stub.GetState("Credito_Token")
+// 	// if err3 != nil || tokenAsBytes == nil {
+// 	// 	return shim.Error("Não foi possível recuperar as informações do seu token")
+// 	// }
+
+// 	// token := Token{}
+// 	// json.Unmarshal(tokenAsBytes, &token)
+
+// 	// fmt.Println("Seu token existe e está sendo modificado")
+
+// 	//Converter acumulador de String para Float
+// 	distAcumulFLoat, err := strconv.ParseFloat(usuario.AcumuladorDistancia, 64)
+
+// 	if distAcumulFLoat == 0 {
+// 		return shim.Error("O veículo não rodou durante o mês")
+// 	}
+
+// 	//Converter emissao padrão da categoria de String para Float
+// 	emissPadFLoat, err := strconv.ParseFloat(categoria.EmissaoPad, 64)
+
+// 	//Realizar calculo de Emissão
+// 	co2EmitidoFloat := emissPadFLoat * distAcumulFLoat
+
+// 	//Converter Emissão para String e inserir no valor respectivo do veículo
+// 	co2EmitidoString := fmt.Sprintf("%.2f", co2EmitidoFloat)
+// 	usuario.Co2Emitido = co2EmitidoString
+
+// 	//Aumentar o volume total do token
+// 	// volOldFloat, err := strconv.ParseFloat(token.VolumeTotal, 64)
+// 	// volOldFloat += co2EmitidoFloat
+// 	// volOldString := fmt.Sprintf("%.2f", volOldFloat)
+// 	// token.VolumeTotal = volOldString
+
+// 	userAsBytes, _ = json.Marshal(usuario)
+// 	//tokenAsBytes, _ = json.Marshal(token)
+
+// 	if err != nil {
+// 		return shim.Error("Houve um problema ao converter o float")
+// 	}
+
+// 	stub.PutState(placa, userAsBytes)
+// 	//stub.PutState(token.CreditoToken, tokenAsBytes)
+
+// 	fmt.Println("O co2 emitido por esse veículo é de :")
+// 	fmt.Println(usuario.Co2Emitido)
+// 	// fmt.Println("No momento o volume de co2 é de:")
+// 	// fmt.Println(token.VolumeTotal)
+
+// 	return shim.Success(nil)
+// }
+
+func (s *SmartContract) calcularCreditos(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
 	if len(args) != 1 {
 		return shim.Error("O argumeto esperado não foi encontrado")
 	}
 
+	fmt.Println("Iniciando calculo de créditos")
 	placa := args[0]
 
 	userAsBytes, err1 := stub.GetState(placa)
@@ -281,22 +360,14 @@ func (s *SmartContract) calcularEmissao(stub shim.ChaincodeStubInterface, args [
 
 	fmt.Println("Esse veículo é um " + categoria.Marca)
 
-	// tokenAsBytes, err3 := stub.GetState("Credito_Token")
-	// if err3 != nil || tokenAsBytes == nil {
-	// 	return shim.Error("Não foi possível recuperar as informações do seu token")
-	// }
-
-	// token := Token{}
-	// json.Unmarshal(tokenAsBytes, &token)
-
-	// fmt.Println("Seu token existe e está sendo modificado")
-
 	//Converter acumulador de String para Float
 	distAcumulFLoat, err := strconv.ParseFloat(usuario.AcumuladorDistancia, 64)
 
 	if distAcumulFLoat == 0 {
 		return shim.Error("O veículo não rodou durante o mês")
 	}
+
+	usuario.Co2Emitido = "0.0"
 
 	//Converter emissao padrão da categoria de String para Float
 	emissPadFLoat, err := strconv.ParseFloat(categoria.EmissaoPad, 64)
@@ -308,75 +379,27 @@ func (s *SmartContract) calcularEmissao(stub shim.ChaincodeStubInterface, args [
 	co2EmitidoString := fmt.Sprintf("%.2f", co2EmitidoFloat)
 	usuario.Co2Emitido = co2EmitidoString
 
-	//Aumentar o volume total do token
-	// volOldFloat, err := strconv.ParseFloat(token.VolumeTotal, 64)
-	// volOldFloat += co2EmitidoFloat
-	// volOldString := fmt.Sprintf("%.2f", volOldFloat)
-	// token.VolumeTotal = volOldString
-
-	userAsBytes, _ = json.Marshal(usuario)
-	//tokenAsBytes, _ = json.Marshal(token)
-
-	if err != nil {
-		return shim.Error("Houve um problema ao converter o float")
-	}
-
-	stub.PutState(placa, userAsBytes)
-	//stub.PutState(token.CreditoToken, tokenAsBytes)
-
-	fmt.Println("O co2 emitido por esse veículo é de :")
-	fmt.Println(usuario.Co2Emitido)
-	// fmt.Println("No momento o volume de co2 é de:")
-	// fmt.Println(token.VolumeTotal)
-
-	return shim.Success(nil)
-}
-
-func (s *SmartContract) calcularCreditos(stub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 1 {
-		return shim.Error("O argumeto esperado não foi encontrado")
-	}
-
-	placa := args[0]
-
-	userAsBytes, err1 := stub.GetState(placa)
-	if err1 != nil || userAsBytes == nil {
-		return shim.Error("Nao foi possível recuperar o seu veículo no sistema")
-	}
-
-	usuario := Usuario{}
-	json.Unmarshal(userAsBytes, &usuario)
-
-	fmt.Println("Sua placa é: " + usuario.Placa)
-
-	categoriaAsBytes, err2 := stub.GetState(usuario.IdCdgCategoria)
-	if err2 != nil || categoriaAsBytes == nil {
-		return shim.Error("Não foi possível recuperar as informações da categoria")
-	}
-
-	categoria := Categoria{}
-	json.Unmarshal(categoriaAsBytes, &categoria)
-
-	fmt.Println("Esse veículo é um " + categoria.Marca)
-
-	//Converter co2 emitido de String para Float
-	co2FLoat, err := strconv.ParseFloat(usuario.Co2Emitido, 64)
-
 	//Converter a meta de emissao de String para Float
 	metaFLoat, err := strconv.ParseFloat(usuario.MetaDeEmissao, 64)
 
+	//Converter creditos já existentes para FLoat
+	creditosOld, err := strconv.ParseFloat(usuario.CreditosDeCarbono, 64)
+
 	//Calcular créditos, zerar valor de emissão
-	creditos := co2FLoat - metaFLoat
-	creditosString := fmt.Sprintf("%.2f", creditos)
+	creditos := metaFLoat - co2EmitidoFloat
+	creditosNew := creditosOld + creditos
+
+	creditosString := fmt.Sprintf("%.2f", creditosNew)
 
 	usuario.CreditosDeCarbono = creditosString
-	usuario.CreditosDeCarbono = "0"
 	usuario.AcumuladorDistancia = "0"
 
 	if err != nil {
 		return shim.Error("Houve um problema ao converter o float")
 	}
+
+	userAsBytes, _ = json.Marshal(usuario)
+	stub.PutState(placa, userAsBytes)
 
 	return shim.Success(nil)
 }

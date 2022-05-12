@@ -28,8 +28,8 @@ if __name__ == "__main__":
     with open('dadosVeicularesAtualizados.json', 'r', encoding='utf-8') as arq:
         banco_json = json.loads(arq.read())
 
-    #Loop para criar 20 placas
-    for i in range(0, 20):
+    #Loop para criar 10 placas
+    for i in range(0, 10):
         
         #Criar uma lista para inserir as letras/numeros no padrão Mercosul (AAA1A11)
         placa = []
