@@ -6,10 +6,14 @@
 
 :root {
     font-size: 62.5%;
+
+    --dark-mode: #121212;
+    --primary-color: rgb(32, 235, 49);
+    --secondary-color: white;
 }
 
 body {
-    background-color: #333;
+    background-color: var(--dark-mode);
     display: flex;
 
     justify-content: center;
@@ -18,14 +22,62 @@ body {
     height: 100vh;
 }
 
-.load {
-    border: 1px solid rgba(0, 0, 0, 0.18);
+#load {
+    border: 1px solid var(--secondary-color);
     width: 20rem;
     height: 20rem;
-    border-left-color: rgb(32, 235, 49);
+    border-left-color: var(--primary-color);
     border-radius: 50%;
 
     animation: loading 1s linear infinite;
+
+    visibility: visible;
+}
+
+#erro {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 1.5rem;
+
+    visibility: collapse;
+}
+
+#erro span {
+    color: var(--secondary-color);
+    font-size: 2.1rem;
+}
+
+#erro ion-icon {
+    color: var(--secondary-color);
+    width: 20rem;
+    height: 20rem;
+}
+
+#conectado {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 1.5rem;
+
+    visibility: collapse;
+}
+
+#conectado span {
+    color: var(--secondary-color);
+    font-size: 2.1rem;
+}
+
+#conectado ion-icon {
+    color: var(--secondary-color);
+    width: 20rem;
+    height: 20rem;
 }
 
 @keyframes loading {

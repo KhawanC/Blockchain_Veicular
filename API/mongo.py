@@ -9,11 +9,11 @@ def somar_elementos(lista):
 distanciaLista = []
 couch = couchdb.Server()
 
-if __name__ == "__main__":
-   with open('dadosVeicularesBase.json', 'r', encoding='utf-8') as arq:
+def estabelecerConexao(): 
+   with open('Chaincode/dadosVeicularesBase.json', 'r', encoding='utf-8') as arq:
          banco_json = json.loads(arq.read())
 
-   # connect to MongoDB
+      # connect to MongoDB
    server = couchdb.Server('http://192.168.0.105:5984/_utils')
    # Acess an existing database
    db = couch['nmi-channel_fabpki']
@@ -27,9 +27,12 @@ if __name__ == "__main__":
       }):
          query_info = json.dumps(doc, indent=4, sort_keys=True)
          query_json = json.loads(query_info)
-         distanciaLista.append(query_json["AcumuladorDistancia"])
+   
+   return query_json
+      #distanciaLista.append(query_json["AcumuladorDistancia"])  
+
       
-   listInt = list(map(float, distanciaLista))
-   distAcumulado = sum(listInt)
-   print(distAcumulado)
+   #listInt = list(map(float, distanciaLista))
+   #distAcumulado = sum(listInt)
+   #print(distAcumulado)
 
