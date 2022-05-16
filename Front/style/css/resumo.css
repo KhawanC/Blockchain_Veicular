@@ -1,0 +1,455 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,400;1,500;1,600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --primary-color: rgb(32, 235, 49);
+    --secondary-color: #fff;
+    --terciary-color: #f5f5f5;
+    --quarta-color: #222;
+    --quinta-color: #999;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+}
+
+/*---------BARRA DA ESQUERDA----------*/
+
+.container .navigation {
+    background-color: var(--primary-color);
+
+    position: fixed;
+
+    width: 300px;
+    height: 100%;
+    
+    border-left: 10px solid var(--primary-color);
+
+    transition: 0.5s;
+    overflow: hidden;
+}
+
+.navigation.ativo {
+    width: 80px;
+}
+
+.container .navigation ul {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.container .navigation ul li {
+    position: relative;
+
+    width: 100%;
+
+    list-style: none;
+
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+
+.container .navigation ul li:hover,
+.container .navigation ul li.hovered {
+    background-color: var(--secondary-color);
+}
+
+.container .navigation ul li:nth-child(1) {
+    margin-bottom: 40px;
+    pointer-events: none;
+}
+
+.container .navigation ul li a {
+    color: var(--secondary-color);
+    display: block;
+    display: flex;
+
+    position: relative;
+
+    text-decoration: none;
+
+    width: 100%;
+}
+
+.container .navigation ul li.hovered a {
+    color: var(--primary-color);
+}
+
+.container .navigation ul li a .icone {
+    display: block;
+
+    position: relative;
+
+    min-width: 60px;
+    height: 60px;
+    line-height: 77px;
+
+    text-align: center;
+
+}
+
+.container .navigation ul li a .icone ion-icon {
+    font-size: 1.75rem;
+}
+
+.container .navigation ul li a .titulo {
+    display: block;
+    position: relative;
+
+    padding: 0 10px;
+
+    height: 60px;
+    line-height: 60px;
+    text-align: start;
+    white-space: nowrap;
+}
+
+.container .navigation ul li:hover a::before,
+.container .navigation ul li.hovered a::before {
+    content: '';
+
+    position: absolute;
+
+    right: 0;
+    top: -50px;
+    
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+    box-shadow: 35px 35px 0 10px var(--secondary-color);
+
+    pointer-events: none;
+}
+
+.container .navigation ul li:hover a::after,
+.container .navigation ul li.hovered a::after {
+    content: '';
+
+    position: absolute;
+
+    right: 0;
+    bottom: -50px;
+    
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+    box-shadow: 35px -35px 0 10px var(--secondary-color);
+
+    pointer-events: none;
+}
+
+
+/*---------MAIN FLUTUANTE------------*/
+
+.container .main {
+    background: var(--secondary-color);
+    position: absolute;
+
+    width: calc(100% - 300px);
+    min-height: 100vh;
+    
+    left: 300px;
+
+    transition: 0.5s;
+}
+
+.container .main.ativo {
+    width: calc(100% - 80px);
+    left: 80px;
+}
+
+.container .main .topbar {
+    display: flex;
+
+    width: 100%;
+    height: 60px;
+    padding: 0 10px;
+
+    align-items: center;
+}
+
+.container .main .topbar .toggle {
+    position: relative;
+
+    align-items: center;
+    justify-content: center;
+
+    top: 0;
+    width: 60px;
+    height: 60px;
+
+    font-size: 2.5rem;
+
+    cursor: pointer;
+}
+
+/*----------CARDS-----------*/
+
+.container .main .cardBox {
+    display: grid;
+    gap: 30px;
+
+    position: relative;
+
+    width: 100%;
+
+    padding: 20px;
+
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.container .main .cardBox .card {
+    background: var(--secondary-color);
+
+    display: flex;
+
+    position: relative;
+
+    justify-content: space-between;
+
+    cursor: pointer;
+
+    padding: 30px;
+
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+}
+
+.container .main .cardBox .card .numbers {
+    color: var(--primary-color);
+    position: relative;
+
+    font-weight: 500;
+    font-size: 1.4em;
+}
+
+.container .main .cardBox .card .cardName {
+    color: var(--quinta-color);
+
+    font-size: 1.1em;
+
+    margin-top: 5px;
+}
+
+.container .main .cardBox .card .iconBox {
+    color: var(--quinta-color);
+    font-size: 3.5em;
+}
+
+.container .main .cardBox .card:hover {
+    background: var(--primary-color);
+}
+
+.container .main .cardBox .card:hover .numbers,
+.container .main .cardBox .card:hover .iconBox,
+.container .main .cardBox .card:hover .cardName {
+    color: var(--secondary-color);
+}
+
+/*------------Viagens Recentes-------------*/
+
+
+.container .main .detalhes {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+
+    position: relative;
+
+    width: 100%;
+
+    padding: 20px;
+    margin-top: 10px;
+    gap: 30px;
+}
+
+.container .main .detalhes .recente {
+    background-color: var(--secondary-color);
+
+    display: grid;
+    position: relative;
+
+    min-height: 50px;
+
+    padding: 20px;
+
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+}
+
+.container .main .detalhes .recente .cardHeader {
+    display: flex;
+
+    align-items: flex-start;
+
+    padding-bottom: 10px;
+}
+
+.container .main .detalhes .recente .cardHeader h2 {
+    color: var(--primary-color);
+
+    font-weight: 600;
+}
+
+.container .main .detalhes table {
+    width: 100%;
+    margin-top: 10px;
+
+    border-collapse: collapse;
+}
+
+.container .main .detalhes table thead td {
+    font-weight: 600;
+}
+
+.container .main .detalhes .recente table tr {
+    color: var(--quarta-color);
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.container .main .detalhes .recente table tr:last-child {
+    border-bottom: none;
+}
+
+.container .main .detalhes .recente table tbody tr:hover {
+    background: var(--primary-color);
+    color: var(--terciary-color);
+}
+
+.container .main .detalhes .recente table tr td {
+    padding: 10px;
+}
+
+.container .main .detalhes .recente table tr td:last-child {
+    text-align: center;
+}
+
+/*---------Veiculos Recentes -------------*/
+
+
+.container .main .registrados {
+    background-color: var(--secondary-color);
+
+    display: grid;
+    position: relative;
+
+    min-height: 50px;
+
+    padding: 20px;
+
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+}
+
+.container .main .registrados .cardHeader {
+    display: flex;
+
+    align-items: flex-start;
+
+    padding-bottom: 10px;
+}
+
+.container .main .registrados .cardHeader h2 {
+    color: var(--primary-color);
+
+    font-weight: 600;
+}
+
+.container .main .registrados table {
+    width: 100%;
+    margin-top: 10px;
+
+    border-collapse: collapse;
+}
+
+
+/*-----------RESPONSIVIDADE-----------*/
+
+@media (max-width: 991px) {
+    .container .navigation {
+        left: -300px;
+    }
+
+    .container .navigation.ativo {
+        width: 300px;
+        left: 0;
+    }
+
+    .container .main {
+        width: 100%;
+        left: 0;
+    }
+
+    .container .main.ativo {
+        left: 300px;
+    }
+
+    .container .main .cardBox {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px){
+    .container .main .detalhes {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .container .main .detalhes .recente{
+        overflow-x: auto;
+    }
+
+    
+}
+
+@media (max-width: 480px) {
+    .container .main .cardBox {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .container .navigation {
+        width: 100%;
+        left: -100%;
+        z-index: 1000;
+    }
+
+    .container .navigation.ativo {
+        width: 100%;
+        left: 0;
+    }
+
+    .container .main .topbar .toggle {
+        z-index: 10001;
+    }
+
+    .container .main.ativo .topbar .toggle {
+        color: var(--secondary-color);
+
+        position: fixed;
+
+        right: 0;
+        left: 350px;
+    }
+}
+
+@media (max-width: 320px) {
+    .container .main .detalhes .recente .cardHeader h2,
+    .container .main .registrados .cardHeader h2 {
+        font-size: 1.2em;
+    }
+
+}

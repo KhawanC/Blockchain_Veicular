@@ -17,7 +17,7 @@ function makeRequest() {
                 conectado.style.visibility = "visible"
 
                 sleep(2500).then( () => {
-                    document.location.href = './pages/home.html'
+                    document.location.href = './pages/resumo.html'
                 });
                 
             }

@@ -5,8 +5,9 @@ import mongo
 app = Flask(__name__)
 CORS(app)
 
+#Data 0 --> ONde ficam os veículos
 data = []
-data.append(mongo.estabelecerConexao())
+data.append(mongo.veiculos)
 
 @app.route('/data', methods=['GET'])
 def get():
