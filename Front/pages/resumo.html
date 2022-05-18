@@ -67,7 +67,7 @@
                 </div>
                 <div class="card">
                     <div>
-                        <div class="numbers">0</div>
+                        <div class="numbers" id="qtdViagens">0</div>
                         <div class="cardName">Viagens Totais</div>
                     </div>
                     <div class="iconBox">
@@ -111,12 +111,7 @@
                                 <td>Distancia</td>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>None</td>
-                                <td>None</td>
-                                <td>0 km</td>
-                            </tr>
+                        <tbody id="tableViagens">
                         </tbody>
                     </table>
                 </div>
@@ -128,13 +123,14 @@
                     <div class="cardHeader">
                         <h2>Veiculos Registrados</h2>
                     </div>
-                        <table id="tableVeiculos">
+                        <table>
                             <thead>
                                 <tr>
                                     <td>Placa</td>
                                 </tr>
                             </thead>
-                            <tbody>
+
+                            <tbody id="tableVeiculos">
                             </tbody>
                         </table>
                 </div>

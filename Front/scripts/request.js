@@ -7,7 +7,7 @@ function sleep(ms) {
 }
 
 function makeRequest() {
-    const url = 'http://localhost:8989/data'
+    const url = 'http://localhost:5000/rotaPadrao'
     fetch(url).then(
         response => {
             console.log(response.json())
