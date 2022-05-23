@@ -10,7 +10,7 @@ cors = CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-@api.route('/rotaPadrao')
+@api.route('/')
 class rotaPadrao(Resource):
     def get(self, ):
         return "Hello World"

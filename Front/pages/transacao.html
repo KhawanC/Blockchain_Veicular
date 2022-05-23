@@ -50,8 +50,25 @@
         <!-- Resumo-->
         <div class="main">
             <div class="topbar">
-                <div class="toggle"><ion-icon name="menu-outline"></ion-icon></div>
+            <div class="toggle"><ion-icon name="menu-outline"></ion-icon></div>
+        </div>
+        
+        <div class="mainTransacao">
+            <div class="cabecalho">
+                <span>Transações</span>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Placa</td>
+                        <td>Hash</td>
+                        <td>Distancia</td>
+                    </tr>
+                </thead>
+                <tbody id="tableTransacoes">
+                </tbody>
+            </table>
+        </div>
 
     <script src="../scripts/menu_toggle.js"></script>
     <script src="../scripts/barra_lateral.js"></script>

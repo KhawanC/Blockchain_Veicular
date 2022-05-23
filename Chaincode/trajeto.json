@@ -1,0 +1,815 @@
+{
+    "html_attributions" : [],
+    "next_page_token" : "Aap_uEBeJTySG11nNHiXOtFZZ3--8o_gKgpLepc-qF4e4BUfm9njzXqTu6Ucp31NXwQKUyHfxQ4JhO9I_DGYGyxbsLkxg7uKvWkRyWoeQhofUzeKcVh1Dr6vYEadhCV944MvNXdfGjEUtOuDetqFjq2b4ftDEkAOP0hyRb2xBfHvqgEjSvrdb8aJl5e3hPY-aEPp9xCubPh-DhdVy4cu80-vdLzr-DehsjoC_Kj9CY9Cv3d2gbJOhrp4R1lROMKCVNjfV79fGVhn2Zo95bvtct6EohYmOGsHcIWeHFS_gByw4jprWG_EO7ZgIUZ2W24qwvcaT4xC6i6b7OclMT1y6hLBZC9mkj8HalmJ17dSv2M-LE3Gd1XSNydB4acarxE2lZnVWHXqe0vw3EGN0-ewDksRgui8q7qCLawk_UHoBGMCbAS2",
+    "results" : [
+       {
+          "geometry" : {
+             "location" : {
+                "lat" : -22.5112498,
+                "lng" : -43.1779306
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.39582838040266,
+                   "lng" : -43.0927205602702
+                },
+                "southwest" : {
+                   "lat" : -22.57199880864167,
+                   "lng" : -43.27319365373346
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/geocode-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Petrópolis",
+          "photos" : [
+             {
+                "height" : 1546,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/110089698292141683044\"\u003eMaciel Emliano\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uEDEFjg_e8cEwbte4iFlbxTKCAB2SZ3hO6FPZEdRUBJVPnf953H0kdwIKPCH9N29oS70eSY8itA10xYjQMxOak6WuCkuiG8ziaCLYeegsAZIvxiXiXYsCh8DHHvJjl46Uwy1B3Py8XLK-LGHailRuQNoFlIj9RRHTLvIHHp-u7nS_84V",
+                "width" : 3264
+             }
+          ],
+          "place_id" : "ChIJbyPZgn4AmQARegBp03EYJKk",
+          "reference" : "ChIJbyPZgn4AmQARegBp03EYJKk",
+          "scope" : "GOOGLE",
+          "types" : [ "locality", "political" ],
+          "vicinity" : "Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.5026571,
+                "lng" : -43.1990819
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.5010636197085,
+                   "lng" : -43.19823936970851
+                },
+                "southwest" : {
+                   "lat" : -22.5037615802915,
+                   "lng" : -43.20093733029151
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/stadium-71.png",
+          "icon_background_color" : "#4DB546",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/stadium_pinlet",
+          "name" : "Estádio Atilio Maroti",
+          "photos" : [
+             {
+                "height" : 2448,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/116909470882075593971\"\u003eRoberto Marcio\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uEDR2894PWItVXykaBd4d2J5vXXj8Jf2gt0U6fcjaM1jlkOkc1xd_OJyjUyVYA_UBKC60vpXL26QS9WYrk-cbeJsf9nFQXRN1Q4E0NzYByhNnhh-Nlgv7G_R1c3L_Eb-WFZDDTyo8RmwlVsFqhtAaJKHZcR0e6UOifoSQyFJb3piFwS-",
+                "width" : 3264
+             }
+          ],
+          "place_id" : "ChIJnZ3Qq3YImQARhmdjF0mUJo8",
+          "plus_code" : {
+             "compound_code" : "FRW2+W9 Quarteirão Ingelheim, Petrópolis - RJ, Brazil",
+             "global_code" : "589RFRW2+W9"
+          },
+          "rating" : 3.9,
+          "reference" : "ChIJnZ3Qq3YImQARhmdjF0mUJo8",
+          "scope" : "GOOGLE",
+          "types" : [ "stadium", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 285,
+          "vicinity" : "Rua Madre Francisca Piá, 400 - Quarteirão Ingelheim, Petrópolis"
+       },
+       {
+          "business_status" : "CLOSED_TEMPORARILY",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4988961,
+                "lng" : -43.1976923
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4974900197085,
+                   "lng" : -43.19640416970851
+                },
+                "southwest" : {
+                   "lat" : -22.5001879802915,
+                   "lng" : -43.19910213029151
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Centro Espírita Caboclo Sete Flechas",
+          "permanently_closed" : true,
+          "photos" : [
+             {
+                "height" : 1024,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/117942279594156560002\"\u003eCentro Espírita Caboclo Sete Flechas\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uECq31aLvLHjZ_dqt80SfzAo5a0DQwyn1mYbKfOvkh_N_qQofx8WjW9yVzDLfsEYbtpxBtHVkIA0XmUzLlo1DJLrbrfBruWKsdHf3aeG3o_D1v1xCj0o9N46PUnG6AlM3BJcZfHQF-RgpKP2H4ipHZdahY2bhND8e1XmIzrnK2jyHwQf",
+                "width" : 1280
+             }
+          ],
+          "place_id" : "ChIJE2gR9XUImQARTtvKqE_SR6k",
+          "plus_code" : {
+             "compound_code" : "GR22+CW Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR22+CW"
+          },
+          "rating" : 4.6,
+          "reference" : "ChIJE2gR9XUImQARTtvKqE_SR6k",
+          "scope" : "GOOGLE",
+          "types" : [ "place_of_worship", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 20,
+          "vicinity" : "Rua Nossa Senhora das Graças, 180-Fundos - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.495305,
+                "lng" : -43.20022480000001
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.49397606970849,
+                   "lng" : -43.1989088697085
+                },
+                "southwest" : {
+                   "lat" : -22.4966740302915,
+                   "lng" : -43.2016068302915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/shopping-71.png",
+          "icon_background_color" : "#4B96F3",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/shopping_pinlet",
+          "name" : "Mercado Tá no Gosto",
+          "opening_hours" : {
+             "open_now" : true
+          },
+          "photos" : [
+             {
+                "height" : 1920,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/104131409143466583718\"\u003eMarioc da Silva\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uEDtpcH5D5e6HKVv4MGIaXv-0t2gc4VwUH7XYrnJYeWIQLwjObIZVlrVYA6UtPfQeUMpe8gYqxvhx20jH39MzfxZfiof5eS-3zyXFRv7ap_GVx_SDR9o0JZTuWnOeBR9q-Zp133f5qOmLrgR06NkFKZKuyOOqcYZeYwzLUNr8lI9SS-7",
+                "width" : 1080
+             }
+          ],
+          "place_id" : "ChIJ4z31H9kHmQARmalVYgm0G7I",
+          "plus_code" : {
+             "compound_code" : "GQ3X+VW Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGQ3X+VW"
+          },
+          "rating" : 4.1,
+          "reference" : "ChIJ4z31H9kHmQARmalVYgm0G7I",
+          "scope" : "GOOGLE",
+          "types" : [ "food", "store", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 642,
+          "vicinity" : "Rua Mosela, 1504 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4978813,
+                "lng" : -43.1996721
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4965071697085,
+                   "lng" : -43.19828031970849
+                },
+                "southwest" : {
+                   "lat" : -22.4992051302915,
+                   "lng" : -43.20097828029149
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/pharmacy-71.png",
+          "icon_background_color" : "#F88181",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/pharmacy_pinlet",
+          "name" : "Drogaria Mosela",
+          "opening_hours" : {
+             "open_now" : true
+          },
+          "photos" : [
+             {
+                "height" : 4032,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/102746704074838595643\"\u003eIGOR 13\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uECx6VzeQSZLei77UA8F86v9c6VdCdOOwud5cb9OuXrOm15cAM6Tc2z3OFgM0JZOwMLUMfVc1XucxwvNk6aG1dDJ5WGXfjs4Bb6gAaugEYkStCbjMkuwcBYzpdk8XEaP_GSYGiui2MtcM2e0thsUsNWWLXfKbAPY3QS7OdNC9nVFF9bE",
+                "width" : 3024
+             }
+          ],
+          "place_id" : "ChIJmesYptgHmQAR3oyeJRnauas",
+          "plus_code" : {
+             "compound_code" : "GR22+R4 Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR22+R4"
+          },
+          "rating" : 4.9,
+          "reference" : "ChIJmesYptgHmQAR3oyeJRnauas",
+          "scope" : "GOOGLE",
+          "types" : [ "pharmacy", "health", "store", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 47,
+          "vicinity" : "Rua Mosela, 1229 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4896135,
+                "lng" : -43.1985245
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.48830101970849,
+                   "lng" : -43.1971758697085
+                },
+                "southwest" : {
+                   "lat" : -22.4909989802915,
+                   "lng" : -43.1998738302915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/school-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/school_pinlet",
+          "name" : "E.M. Bataillard",
+          "photos" : [
+             {
+                "height" : 2240,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/107347440345580007355\"\u003eSÉRGIO PANDELÓ\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uEA6ABIgYeL8LEJ1lnVZt9L3QATJYioLehplhimKXr5TToFuqTu3XrTSnl7Pr7smuZOkLpQqUuY__lq8RlS7ifBY8v3ehSBbKd0-wK7FHazt6MXiPPS2nEIG94pR6uwxzI-PxVdCwa24SJPHY7lYLs9pi8wucvgzsgnJ1eCqy__IuAxx",
+                "width" : 4608
+             }
+          ],
+          "place_id" : "ChIJMfSZidsHmQARfvcjp9-zAYw",
+          "plus_code" : {
+             "compound_code" : "GR62+5H Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR62+5H"
+          },
+          "rating" : 4.5,
+          "reference" : "ChIJMfSZidsHmQARfvcjp9-zAYw",
+          "scope" : "GOOGLE",
+          "types" : [ "school", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 8,
+          "vicinity" : "Rua Bataillard, S/N - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4965506,
+                "lng" : -43.19993700000001
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4951952197085,
+                   "lng" : -43.1986818697085
+                },
+                "southwest" : {
+                   "lat" : -22.4978931802915,
+                   "lng" : -43.2013798302915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/civic_building-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/civic-bldg_pinlet",
+          "name" : "CEE Petrópolis",
+          "opening_hours" : {
+             "open_now" : false
+          },
+          "place_id" : "ChIJ091mktgHmQARRAAuotriPmk",
+          "plus_code" : {
+             "compound_code" : "GR32+92 Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR32+92"
+          },
+          "rating" : 1.2,
+          "reference" : "ChIJ091mktgHmQARRAAuotriPmk",
+          "scope" : "GOOGLE",
+          "types" : [ "post_office", "finance", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 316,
+          "vicinity" : "Rua Mosela, 1378 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4967561,
+                "lng" : -43.2001096
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4954020197085,
+                   "lng" : -43.19873216970851
+                },
+                "southwest" : {
+                   "lat" : -22.4980999802915,
+                   "lng" : -43.2014301302915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#13B5C7",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Rafael Justen Dj - Connect Djs",
+          "opening_hours" : {
+             "open_now" : true
+          },
+          "photos" : [
+             {
+                "height" : 1365,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/106416599656646008390\"\u003eRafael Justen Dj - Connect Djs\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uEBSBAdaDJmJeRpEDCF4ErP0i5NPmlV0ZXsqGjiB5vY3VWxyc9HIjSy2unYW06nwEevlXyP0HFznLZRZsZs0JYIDW4YLJR5XEATxUiTbFHHaWaWOpu5apzPdyXg0TcwKudcA0jqGNgdUHj9ay9Kio2dqnQnZPraorTI2CtbMQz0HoTPi",
+                "width" : 2045
+             }
+          ],
+          "place_id" : "ChIJDwTtmwcImQARgNsyZAnpCqs",
+          "plus_code" : {
+             "compound_code" : "GQ3X+7X Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGQ3X+7X"
+          },
+          "rating" : 5,
+          "reference" : "ChIJDwTtmwcImQARgNsyZAnpCqs",
+          "scope" : "GOOGLE",
+          "types" : [ "point_of_interest", "establishment" ],
+          "user_ratings_total" : 2,
+          "vicinity" : "Vila José Pedro Wilbert, 240 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4978549,
+                "lng" : -43.1996152
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4965039197085,
+                   "lng" : -43.1982628697085
+                },
+                "southwest" : {
+                   "lat" : -22.4992018802915,
+                   "lng" : -43.2009608302915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Fundação Cultural Petrópolis",
+          "place_id" : "ChIJ7_oMptgHmQAR_eigs-eJD44",
+          "plus_code" : {
+             "compound_code" : "GR22+V5 Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR22+V5"
+          },
+          "reference" : "ChIJ7_oMptgHmQAR_eigs-eJD44",
+          "scope" : "GOOGLE",
+          "types" : [ "point_of_interest", "establishment" ],
+          "vicinity" : "Rua Mosela, 1239 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4961764,
+                "lng" : -43.2005488
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4947448697085,
+                   "lng" : -43.19917186970849
+                },
+                "southwest" : {
+                   "lat" : -22.4974428302915,
+                   "lng" : -43.20186983029149
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/school-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/school_pinlet",
+          "name" : "E. Municipal Frei Aniceto",
+          "opening_hours" : {
+             "open_now" : true
+          },
+          "photos" : [
+             {
+                "height" : 4160,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/105301808427839216865\"\u003eEduardo Schanuel\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uEAgZQhrj1hfCg-FC8PAW5_xLB1PCkQCLB7e28z7Y1ltOXNet35vazNoaNbtuRiDiCo4waKfsX995aAKLHr3DJMGbIglsO3bZzShuYCBhVG0x57OmsGIw2TaEOjRz64N54vf9mg88HyXbyBh19ekEMN8Wx3hnU6n5Mc_vlXs7zWTI_zY",
+                "width" : 2336
+             }
+          ],
+          "place_id" : "ChIJV5JR3dgHmQARq34ccPtgphQ",
+          "plus_code" : {
+             "compound_code" : "GQ3X+GQ Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGQ3X+GQ"
+          },
+          "rating" : 5,
+          "reference" : "ChIJV5JR3dgHmQARq34ccPtgphQ",
+          "scope" : "GOOGLE",
+          "types" : [ "school", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 2,
+          "vicinity" : "Rua Mosela, 1445 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.492447,
+                "lng" : -43.199164
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4911014697085,
+                   "lng" : -43.1977810197085
+                },
+                "southwest" : {
+                   "lat" : -22.4937994302915,
+                   "lng" : -43.2004789802915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "LOWVINTE",
+          "opening_hours" : {
+             "open_now" : true
+          },
+          "place_id" : "ChIJ-a08ltwHmQARmYJorCdvAEk",
+          "plus_code" : {
+             "compound_code" : "GR52+28 Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR52+28"
+          },
+          "reference" : "ChIJ-a08ltwHmQARmYJorCdvAEk",
+          "scope" : "GOOGLE",
+          "types" : [ "point_of_interest", "establishment" ],
+          "vicinity" : "Rua Bataillard, 1051 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4938025,
+                "lng" : -43.2007003
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4924971697085,
+                   "lng" : -43.1993028697085
+                },
+                "southwest" : {
+                   "lat" : -22.4951951302915,
+                   "lng" : -43.2020008302915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Silfer",
+          "place_id" : "ChIJqyZSDNkHmQARrxgwSMahNJM",
+          "plus_code" : {
+             "compound_code" : "GQ4X+FP Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGQ4X+FP"
+          },
+          "reference" : "ChIJqyZSDNkHmQARrxgwSMahNJM",
+          "scope" : "GOOGLE",
+          "types" : [ "point_of_interest", "establishment" ],
+          "vicinity" : "Rua Mosela, 1682 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4938182,
+                "lng" : -43.2031135
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4924438197085,
+                   "lng" : -43.2017575197085
+                },
+                "southwest" : {
+                   "lat" : -22.4951417802915,
+                   "lng" : -43.20445548029149
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/shopping-71.png",
+          "icon_background_color" : "#4B96F3",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/shopping_pinlet",
+          "name" : "Grife da arte",
+          "opening_hours" : {
+             "open_now" : false
+          },
+          "photos" : [
+             {
+                "height" : 657,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/112544274301296864184\"\u003eGrife da arte\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uED_BzWTRVL7FHiBb4lxUKkO2HJ9Gt86oLSBsfVub1H1p-TeiUoq0PkYzK1c6v0xVb8z2weCYvN7Y0buoT2SrYuBpaOL5sSlsXxlbv4gpWDsqXCmVHNLWDwhAg7zBhrqeAeX0j_FKit-Ys5v1zoc13jroplxOxmdpsXJDAIk_d6ZkDQU",
+                "width" : 493
+             }
+          ],
+          "place_id" : "ChIJ29QUxNkHmQARNYgKm--tqqM",
+          "plus_code" : {
+             "compound_code" : "GQ4W+FQ Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGQ4W+FQ"
+          },
+          "rating" : 5,
+          "reference" : "ChIJ29QUxNkHmQARNYgKm--tqqM",
+          "scope" : "GOOGLE",
+          "types" : [ "store", "food", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 3,
+          "vicinity" : "Rua Pedras Brancas, 67 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.49170299999999,
+                "lng" : -43.1989065
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.49035366970849,
+                   "lng" : -43.19765221970851
+                },
+                "southwest" : {
+                   "lat" : -22.4930516302915,
+                   "lng" : -43.20035018029151
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Mosela Designer",
+          "opening_hours" : {
+             "open_now" : true
+          },
+          "place_id" : "ChIJTd1giNsHmQARVOTmntsSA9A",
+          "plus_code" : {
+             "compound_code" : "GR52+8C Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR52+8C"
+          },
+          "reference" : "ChIJTd1giNsHmQARVOTmntsSA9A",
+          "scope" : "GOOGLE",
+          "types" : [ "point_of_interest", "establishment" ],
+          "vicinity" : "Rua Bataillard, 274 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.493099,
+                "lng" : -43.199166
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.49172741970849,
+                   "lng" : -43.19788476970849
+                },
+                "southwest" : {
+                   "lat" : -22.4944253802915,
+                   "lng" : -43.20058273029149
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Nossa Consultoria",
+          "opening_hours" : {
+             "open_now" : true
+          },
+          "place_id" : "ChIJGybPrNAHmQARW-h2mF-NOGU",
+          "plus_code" : {
+             "compound_code" : "GR42+Q8 Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR42+Q8"
+          },
+          "reference" : "ChIJGybPrNAHmQARW-h2mF-NOGU",
+          "scope" : "GOOGLE",
+          "types" : [ "point_of_interest", "establishment" ],
+          "vicinity" : "Rua Bataillard, 228 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.493839,
+                "lng" : -43.1983474
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4925491697085,
+                   "lng" : -43.1969627697085
+                },
+                "southwest" : {
+                   "lat" : -22.4952471302915,
+                   "lng" : -43.1996607302915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/museum-71.png",
+          "icon_background_color" : "#13B5C7",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/museum_pinlet",
+          "name" : "Gallery 275 - Vintage Motorcycle",
+          "opening_hours" : {
+             "open_now" : false
+          },
+          "photos" : [
+             {
+                "height" : 1536,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/117924530029746889923\"\u003eGallery 275 - Motorcycle Vintage\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uEC95Mokdnh6lbJtVjzeAMF9ORpDeXH77Z1nhP_Kkvvp8_a6ghjl-DwB8JUUQWDydTpf5onW994Jni77s-K9yxHdhG7q8OX23HeiHvk_pGHpymPZmtgTJzvPTiM2nPa87LNlve2Kzxis56949VT0lLmlXicEHuYNMhO34qWuronHXCpt",
+                "width" : 2048
+             }
+          ],
+          "place_id" : "ChIJ0V2xp94HmQAR_awm_1BNx9c",
+          "plus_code" : {
+             "compound_code" : "GR42+FM Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR42+FM"
+          },
+          "rating" : 4.8,
+          "reference" : "ChIJ0V2xp94HmQAR_awm_1BNx9c",
+          "scope" : "GOOGLE",
+          "types" : [ "museum", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 210,
+          "vicinity" : "Rua Cândido Portinari, 275 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4905705,
+                "lng" : -43.19758649999999
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4891848697085,
+                   "lng" : -43.19626016970849
+                },
+                "southwest" : {
+                   "lat" : -22.4918828302915,
+                   "lng" : -43.19895813029149
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "ReisVeículos",
+          "opening_hours" : {
+             "open_now" : true
+          },
+          "place_id" : "ChIJkS8h69wHmQARwXBh6GQ4amY",
+          "plus_code" : {
+             "compound_code" : "GR52+QX Quarteirão Brasileiro, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR52+QX"
+          },
+          "reference" : "ChIJkS8h69wHmQARwXBh6GQ4amY",
+          "scope" : "GOOGLE",
+          "types" : [ "point_of_interest", "establishment" ],
+          "vicinity" : "Rua Virgílio Sá Pereira, 897-1071 - Quarteirão Brasileiro, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4925597,
+                "lng" : -43.2015515
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.49120941970849,
+                   "lng" : -43.2001947697085
+                },
+                "southwest" : {
+                   "lat" : -22.4939073802915,
+                   "lng" : -43.2028927302915
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Maison Magamez",
+          "photos" : [
+             {
+                "height" : 3120,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/114350820753547687186\"\u003eMarta Narciso\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uECGTUvDgK22A_Oc1gJfg12Qx2rkzixv5Vr6qPeFiPUPvpsSjbqIO7mUWXiN0d-OvBimvEA7zxNYjNx6cMGqZ4P333jf7GGSpmGOUmkEvLcHUJ1OFtnM937LkgBe0HOfUXlncfl8E31YX6OGCdOxkqjgzEJpXnNWVcbjPcnX63Mp_pPf",
+                "width" : 4160
+             }
+          ],
+          "place_id" : "ChIJoU_2d9kHmQARaQcvwsOPK1k",
+          "plus_code" : {
+             "compound_code" : "GQ4X+X9 Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGQ4X+X9"
+          },
+          "rating" : 4.6,
+          "reference" : "ChIJoU_2d9kHmQARaQcvwsOPK1k",
+          "scope" : "GOOGLE",
+          "types" : [ "point_of_interest", "establishment" ],
+          "user_ratings_total" : 229,
+          "vicinity" : "Rua Alberto de Oliveira, 94 - Mosela, Petrópolis"
+       },
+       {
+          "business_status" : "OPERATIONAL",
+          "geometry" : {
+             "location" : {
+                "lat" : -22.4898779,
+                "lng" : -43.1986394
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.4885182197085,
+                   "lng" : -43.19735311970851
+                },
+                "southwest" : {
+                   "lat" : -22.4912161802915,
+                   "lng" : -43.20005108029151
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/worship_general-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/worship_christian_pinlet",
+          "name" : "Igreja Internacional da Graça de Deus",
+          "place_id" : "ChIJb1ihptwHmQARWzJ3wPheLxI",
+          "plus_code" : {
+             "compound_code" : "GR62+2G Mosela, Petrópolis - RJ, Brazil",
+             "global_code" : "589RGR62+2G"
+          },
+          "rating" : 3,
+          "reference" : "ChIJb1ihptwHmQARWzJ3wPheLxI",
+          "scope" : "GOOGLE",
+          "types" : [ "church", "place_of_worship", "point_of_interest", "establishment" ],
+          "user_ratings_total" : 2,
+          "vicinity" : "Rua João Martins de Barros, 52 - Mosela, Petrópolis"
+       },
+       {
+          "geometry" : {
+             "location" : {
+                "lat" : -22.496707,
+                "lng" : -43.2001376
+             },
+             "viewport" : {
+                "northeast" : {
+                   "lat" : -22.48900952916979,
+                   "lng" : -43.18555212862253
+                },
+                "southwest" : {
+                   "lat" : -22.50410451412953,
+                   "lng" : -43.21445631255057
+                }
+             }
+          },
+          "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/geocode-71.png",
+          "icon_background_color" : "#7B9EB0",
+          "icon_mask_base_uri" : "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+          "name" : "Mosela",
+          "photos" : [
+             {
+                "height" : 1908,
+                "html_attributions" : [
+                   "\u003ca href=\"https://maps.google.com/maps/contrib/101692805526760923103\"\u003eClovis S. Barros\u003c/a\u003e"
+                ],
+                "photo_reference" : "Aap_uEBeZgn_TkWKrcjta5DZIIv3h1pM0OOkhBMYpmTznX-XjPSYDLwiuu39dBKgnxSJAJp1dEi2N5zr7B-meSjNHKX78FM66qZpqYV--v0y_ocmqpz7tQDprX5Jps4DE8uW9LL8mvl8QmdTmq2nN1kNPbQUHoX37k6t6EbfwhlYpADA-oYv",
+                "width" : 4128
+             }
+          ],
+          "place_id" : "ChIJEapWwNgHmQARd_6MVYBO2og",
+          "reference" : "ChIJEapWwNgHmQARd_6MVYBO2og",
+          "scope" : "GOOGLE",
+          "types" : [ "sublocality_level_1", "sublocality", "political" ],
+          "vicinity" : "Mosela"
+       }
+    ],
+    "status" : "OK"
+ }
