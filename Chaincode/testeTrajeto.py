@@ -13,26 +13,29 @@
 # print(response.text)
 
 
-# import requests
+import requests, random, json
 
 
-# key = 'AIzaSyBhKwgrSEqNJPX98SH1lVQM_kL-FOAmGpo'
-# lat = '-22.492277969335433'
-# long = '-43.19911005771312'
+key = 'AIzaSyBhKwgrSEqNJPX98SH1lVQM_kL-FOAmGpo'
+geolocate_url = 'https://www.googleapis.com/geolocation/v1/geolocate?key={c}'.format(c=key)
+# nearby_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={a}%&radius=50000&type=lodging&key={c}".format(a=lat, b=long, c=key)
 
-# url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={a}%2C{b}&radius=1500&key={c}".format(a=lat, b=long, c=key)
+response1 = requests.post(geolocate_url, {
+    'location',
+    'accuracy'
+})
+
+print(response1.text)
 
 # payload={}
 # headers = {}
 
-# response = requests.request("GET", url, headers=headers, data=payload)
+# response2 = requests.request("GET", nearby_url, headers=headers, data=payload)
 
-# print(response.text)
+# info = json.loads(response2.text)
+# aleat_num = random.randint(0, len(info['results']))
+# print(info['results'][aleat_num]['vicinity'])
 
-import json
 
-with open("trajetp.json") as f:
-    arq_json = json.load(f)
-    
-print(arq_json)
+
     
