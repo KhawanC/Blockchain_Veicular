@@ -25,10 +25,9 @@ import (
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
-//Criar sequencia de letras
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890") //Criar sequencia de letras
 
-func AleatString(n int) string {
+func AleatString(n int) string { //Função para criar uma sequencia de números aleatórios
 	b := make([]rune, n)
 	for i := range b {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
@@ -36,7 +35,7 @@ func AleatString(n int) string {
 	return string(b)
 }
 
-func Encode(msg string) string {
+func Encode(msg string) string { //Função para criar um hash sha-1
 	h := sha1.New()
 	h.Write([]byte(msg))
 	sha1_hash := hex.EncodeToString(h.Sum(nil))
@@ -47,36 +46,30 @@ type SmartContract struct {
 }
 
 type Categoria struct {
-	CdgCategoria string `json:"CdgCategoria"` // PK
-	Categoria    string `json:"Categoria"`
-	Marca        string `json:"Marca"`
-	Versao       string `json:"Versao"`
-	Modelo       string `json:"Modelo"`
-	EmissaoPad   string `json:"EmissaoPad"`
+	CdgCategoria string  `json:"CdgCategoria"` // PK
+	Categoria    string  `json:"Categoria"`
+	Marca        string  `json:"Marca"`
+	Versao       string  `json:"Versao"`
+	Modelo       string  `json:"Modelo"`
+	EmissaoPad   float64 `json:"EmissaoPad"`
 }
 
 type Usuario struct {
-	Placa               string `json:"Placa"`          // PK
-	IdCdgCategoria      string `json:"IdCdgCategoria"` //FK (Categoria)
-	AcumuladorDistancia string `json:"AcumuladorDistancia"`
-	Co2Emitido          string `json:"Co2Emitido"`
-	CreditosDeCarbono   string `json:"CreditosDeCarbono"`
+	Placa               string  `json:"Placa"`          // PK
+	IdCdgCategoria      string  `json:"IdCdgCategoria"` //FK (Categoria)
+	AcumuladorDistancia float64 `json:"AcumuladorDistancia"`
+	Co2Emitido          float64 `json:"Co2Emitido"`
 }
 
 type Trajeto struct {
-	TrajetoHash      string `json:"TrajetoHash"` // PK
-	TrajetoDistancia string `json:"TrajetoDistancia"`
+	TrajetoHash      string  `json:"TrajetoHash"` // PK
+	TrajetoDistancia float64 `json:"TrajetoDistancia"`
 }
 
 type TrajetoUsuario struct {
 	Viagem    string `json:"Viagem"`    // PK
 	IdPlaca   string `json:"IdPlaca"`   //FK (Usuario)
 	IdTrajeto string `json:"IdTrajeto"` //FK (Trajeto)
-}
-
-type Token struct {
-	CreditoToken  string `json:"CreditoToken"` //PK
-	MetaDeEmissao string `json:"MetaDeEmissao"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -88,15 +81,10 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 
 	if fn == "registrarBanco" {
 		return s.registrarBanco(stub, args)
-
 	} else if fn == "registrarUsuario" {
 		return s.registrarUsuario(stub, args)
-
 	} else if fn == "registrarTrajeto" {
 		return s.registrarTrajeto(stub, args)
-
-	} else if fn == "calcularCreditos" {
-		return s.calcularCreditos(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
@@ -118,49 +106,38 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	modelo := args[4]
 	emissao := args[5]
 
-	//Arredondar a emissao padrao para 2 casas decimais
-	emissFloat, err := strconv.ParseFloat(emissao, 64)
-	emissString := fmt.Sprintf("%.2f", emissFloat)
-
-	//Criando o token
-	var credito = Token{
-		CreditoToken: "Credito_Token",
-	}
-
-	//Inserindo argumentos dentro da Struct Categoria
-	var CategoriaInfor = Categoria{
-		Categoria:    categoria,
-		Marca:        marca,
-		Versao:       versao,
-		Modelo:       modelo,
-		EmissaoPad:   emissString,
-		CdgCategoria: codigo,
-	}
-
-	//Encapsulando as informações em arquivo JSON
-	CategoriaAsBytes, _ := json.Marshal(CategoriaInfor)
-	tokenAsBytes, _ := json.Marshal(credito)
-
-	//Inserindo valores no ledger, com uma informação associada à uma chave
-	stub.PutState(codigo, CategoriaAsBytes)
-	stub.PutState(credito.CreditoToken, tokenAsBytes)
+	emissFloat, err := strconv.ParseFloat(emissao, 64) //Convertendo a emissão para float
 
 	if err != nil {
 		return shim.Error("Houve um problema ao converter o float")
 	}
 
+	var CategoriaInfor = Categoria{ //Inserindo argumentos dentro da Struct Categoria
+		Categoria:    categoria,
+		Marca:        marca,
+		Versao:       versao,
+		Modelo:       modelo,
+		EmissaoPad:   emissFloat,
+		CdgCategoria: codigo,
+	}
+
+	CategoriaAsBytes, _ := json.Marshal(CategoriaInfor) //Encapsulando as informações em arquivo JSON
+
+	stub.PutState(codigo, CategoriaAsBytes) //Inserindo valores no ledger, com uma informação associada à uma chave
+
 	//Confirmação do chaincode
-	fmt.Println("Registrando seu banco de veiculos...")
+	fmt.Println("Registro de categoria inserido com sucesso")
 	return shim.Success(nil)
 }
 
-//Função que recebe userLedger e insere o veículo do usuário no Ledger
+//Função que recebe "./userLedger" e insere o veículo do usuário no Ledger
 func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	//Verificar se existem mais de 2 argumentos no código do cliente
 	if len(args) != 2 {
 		return shim.Error("Eram esperados 2 argumentos... Tente novamente!")
 	}
+
 	userPlaca := args[0]
 	cdgCategoriaUser := args[1]
 
@@ -168,9 +145,8 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	userVeiculo := Usuario{
 		Placa:               userPlaca,
 		IdCdgCategoria:      cdgCategoriaUser,
-		AcumuladorDistancia: "0.0",
-		Co2Emitido:          "0.0",
-		CreditosDeCarbono:   "0.0",
+		AcumuladorDistancia: 0.0,
+		Co2Emitido:          0.0,
 	}
 
 	veiculoAsBytes, _ := json.Marshal(userVeiculo)
@@ -178,8 +154,9 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	//Inserir valores no ledger. ID = placa do veículo
 	stub.PutState(userPlaca, veiculoAsBytes)
 
+	//Confirmação do chaincode
+	fmt.Println("Registro de usuário inserido com sucesso")
 	return shim.Success(nil)
-
 }
 
 func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args []string) sc.Response {
@@ -193,10 +170,9 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	userPlaca := args[0]
 	userDistancia := args[1]
 
-	userDistFLoat, err := strconv.ParseFloat(userDistancia, 64)
+	userDistFLoat, err := strconv.ParseFloat(userDistancia, 64) //Convertendo a distância recebida para float
 
-	//Criando código unico para Struct trajeto
-	cdgUnico := Encode(AleatString(20))
+	cdgUnico := Encode(AleatString(20)) //Criando código unico para Struct trajeto
 
 	//Criar Struct do trajeto e do usuário
 	trajetoUsuario := TrajetoUsuario{}
@@ -214,22 +190,18 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	usuario := Usuario{}
 	json.Unmarshal(UsuarioAsBytes, &usuario)
 
-	//Converter a distância acumulada do usuario para Float
-	distAcumulFLoat, err := strconv.ParseFloat(usuario.AcumuladorDistancia, 64)
+	distAcumulado := usuario.AcumuladorDistancia //Inserindo o acumulador de distância do usuário dentro de uma variável
 
-	//Adicionar a distancia do trajeto feito ao acumulador
-	distAcumulFLoat += userDistFLoat
+	distAcumulado += userDistFLoat //Adicionar a distancia do trajeto feito ao acumulador
 
-	//Converter valor em FLoat do acumulador para String e inserir no objeto do usuário
-	distAcumulString := fmt.Sprintf("%.2f", distAcumulFLoat)
-	usuario.AcumuladorDistancia = distAcumulString
+	usuario.AcumuladorDistancia = distAcumulado
 
 	//Criar assinatura do trajeto
 	trajeto.TrajetoHash = cdgUnico
-	trajeto.TrajetoDistancia = userDistancia
+	trajeto.TrajetoDistancia = userDistFLoat
 
 	//Associar trajeto com o usuário
-	trajetoUsuario.Viagem = trajeto.TrajetoHash + "-" + usuario.Placa
+	trajetoUsuario.Viagem = "travel-" + trajeto.TrajetoHash + "-" + usuario.Placa
 	trajetoUsuario.IdPlaca = usuario.Placa
 	trajetoUsuario.IdTrajeto = trajeto.TrajetoHash
 
@@ -242,120 +214,6 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	stub.PutState(usuario.Placa, UsuarioAsBytesFinal)
 	stub.PutState(trajeto.TrajetoHash, TrajetoAsBytes)
 	stub.PutState(trajetoUsuario.Viagem, UsuarioTrajetoAsBytes)
-
-	return shim.Success(nil)
-}
-
-func (s *SmartContract) calcularMeta(stub shim.ChaincodeStubInterface, args []string) sc.Response {
-	if len(args) != 1 {
-		return shim.Error("O argumeto esperado não foi encontrado")
-	}
-
-	mediaEmissPad := args[0]
-	mediaTrajetos := args[1]
-
-	tokenAsBytes, err := stub.GetState("Credito_Token")
-	if err != nil {
-		return shim.Error("Nao foi possível recuperar o token da rede")
-	}
-
-	token := Token{}
-
-	//Convertendo os valores de String para Float
-	mediaEmissFloat, err2 := strconv.ParseFloat(mediaEmissPad, 64)
-	mediaTrajetoFloat, err2 := strconv.ParseFloat(mediaTrajetos, 64)
-
-	if err2 != nil {
-		return shim.Error("Nao foi possível converter algum dos valores de String para Float")
-	}
-
-	metaDeEmissFloat := (mediaEmissFloat * mediaTrajetoFloat)
-	metaDeEmissaoString := fmt.Sprintf("%.2f", metaDeEmissFloat)
-	token.MetaDeEmissao = metaDeEmissaoString
-
-	tokenAsBytes, _ = json.Marshal(token)
-	stub.PutState("Credito_Token", tokenAsBytes)
-
-	return shim.Success(nil)
-}
-
-func (s *SmartContract) calcularCreditos(stub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 1 {
-		return shim.Error("O argumeto esperado não foi encontrado")
-	}
-
-	fmt.Println("Iniciando calculo de créditos")
-	placa := args[0]
-
-	tokenAsBytes, err := stub.GetState("Credito_Token")
-	if err != nil {
-		return shim.Error("Nao foi possível recuperar o token da rede")
-	}
-
-	token := Token{}
-	json.Unmarshal(tokenAsBytes, &token)
-
-	userAsBytes, err1 := stub.GetState(placa)
-	if err1 != nil || userAsBytes == nil {
-		return shim.Error("Nao foi possível recuperar o seu veículo no sistema")
-	}
-
-	usuario := Usuario{}
-	json.Unmarshal(userAsBytes, &usuario)
-
-	fmt.Println("Sua placa é: " + usuario.Placa)
-
-	categoriaAsBytes, err2 := stub.GetState(usuario.IdCdgCategoria)
-	if err2 != nil || categoriaAsBytes == nil {
-		return shim.Error("Não foi possível recuperar as informações da categoria")
-	}
-
-	categoria := Categoria{}
-	json.Unmarshal(categoriaAsBytes, &categoria)
-
-	fmt.Println("Esse veículo é um " + categoria.Marca)
-
-	//Converter acumulador de String para Float
-	distAcumulFLoat, err := strconv.ParseFloat(usuario.AcumuladorDistancia, 64)
-
-	if distAcumulFLoat == 0 {
-		return shim.Error("O veículo não rodou durante o mês")
-	}
-
-	usuario.Co2Emitido = "0.0"
-
-	//Converter Meta de Emissão do Token
-	metaEmissToken, err := strconv.ParseFloat(token.MetaDeEmissao, 64)
-
-	//Converter emissao padrão da categoria de String para Float
-	emissPadFLoat, err := strconv.ParseFloat(categoria.EmissaoPad, 64)
-
-	//Realizar calculo de Emissão
-	co2EmitidoFloat := emissPadFLoat * distAcumulFLoat
-
-	//Converter Emissão para String e inserir no valor respectivo do veículo
-	co2EmitidoString := fmt.Sprintf("%.2f", co2EmitidoFloat)
-	usuario.Co2Emitido = co2EmitidoString
-
-	//Converter creditos já existentes para FLoat
-	creditosOld, err := strconv.ParseFloat(usuario.CreditosDeCarbono, 64)
-
-	//Calcular créditos, zerar valor de emissão
-	creditos := metaEmissToken - co2EmitidoFloat
-	creditosNew := creditosOld + creditos
-
-	creditosString := fmt.Sprintf("%.2f", creditosNew)
-
-	usuario.CreditosDeCarbono = creditosString
-	usuario.AcumuladorDistancia = "0"
-
-	if err != nil {
-		return shim.Error("Houve um problema ao converter o float")
-	}
-
-	userAsBytes, _ = json.Marshal(usuario)
-	stub.PutState(placa, userAsBytes)
 
 	return shim.Success(nil)
 }
