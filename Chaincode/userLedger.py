@@ -1,4 +1,4 @@
-import json, sys, random
+import json, sys, random, couchdb
 from time import sleep
 from hfc.fabric import Client as client_fabric
 import asyncio
@@ -13,6 +13,10 @@ domain = "ptb.de"
 channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
+couch = couchdb.Server()
+server = couchdb.Server('http://localhost:5984/_utils')
+db = couch['nmi-channel_fabpki']
+items = []
 
 # Variáveis para verificação da placa
 nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -24,12 +28,8 @@ bancoPlacas = []
 
 if __name__ == "__main__":
 
-    # Método para ler arquivo json atualizado pelo bancoLedger.py
-    with open('dadosVeicularesAtualizados.json', 'r', encoding='utf-8') as arq:
-        banco_json = json.loads(arq.read())
-
     #Loop para criar 10 placas
-    for i in range(0, 10):
+    for i in range(0, 200):
         
         #Criar uma lista para inserir as letras/numeros no padrão Mercosul (AAA1A11)
         placa = []
@@ -69,7 +69,12 @@ if __name__ == "__main__":
     
     #Iniciando função para verificar se há duplicadas
     removerDuplicados(bancoPlacas)
-
+    
+    #Acesso couchdb e recuperando modelos
+    for doc in db.view('_all_docs'):
+        i = doc['id']
+        if i[0:6] == "model-":
+            items.append(i)
     loop = asyncio.get_event_loop()
 
     c_hlf = client_fabric(net_profile=(domain + ".json"))
@@ -81,16 +86,7 @@ if __name__ == "__main__":
 
     #Loop para enviar ao chaincode cada placa 
     for i in range(len(bancoPlacas)):
-        #Criando um numero aleatório para ser associado ao index de categorias do arquivo json
-        valor = random.randint(0, len(banco_json["Modelo_Veiculos"]) - 1)
-        contador2 = 0
-        #Criando um loop para pegar todos os códigos de veiculo do arquivo json
-        for cdg in banco_json["Modelo_Veiculos"]:
-            #Quando o index aleatório for referente a sua representação do seu código no json uma nova
-            #variavel é criada para armazenar esse código
-            if valor == contador2:
-                cdgVeiculo = cdg
-            contador2 += 1
+        x = random.randint(0, (len(items)-1))
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,
@@ -98,22 +94,7 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarUsuario',
-            args=[bancoPlacas[i], cdgVeiculo],
+            args=[bancoPlacas[i], items[x]],
             cc_pattern=None))
-    
-    #Loop que armazena a quantidade de placas criadas pelo loop anterior
-    qtd_veiculos_json = len(banco_json["Placas"])
-
-    #Armazenado todas as placas no arquivo json para manipulação posterior
-    for i in range(len(bancoPlacas)):
-        banco_json["Placas"][qtd_veiculos_json] = bancoPlacas[i]
-        qtd_veiculos_json = len(banco_json["Placas"])
-
-    #Encapsulando valor em uma variavel do tipo string, formatada
-    data = json.dumps(banco_json, indent=2)
-    
-    #Salvando arquivo json com novos valores
-    with open('dadosVeicularesAtualizados.json', 'w', encoding='utf-8') as arq_w:
-        arq_w.write(data)
         
-    print("Veiculo registrado com sucesso !")
+    print("Veiculos registrado com sucesso !")

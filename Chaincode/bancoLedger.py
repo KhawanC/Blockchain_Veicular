@@ -1,7 +1,5 @@
-from os import kill
 import sys, json, asyncio
 from random import gauss
-from urllib import response
 from hfc.fabric import Client as client_fabric
 
 domain = "ptb.de"
@@ -15,14 +13,10 @@ if __name__ == "__main__":
     with open("dadosVeicularesBase.json", 'r', encoding='utf8') as f:
         arq_json = json.load(f)
 
-    # Atualizar todas as emissões dentro do arq_json com base no cálculo de distribuição normal
+    # Atualizar todas as emissões dentro do arq_json com base no cálculo de distribuição normal    
     for i in range(len(arq_json)):
-        arq_json[i]["Gasolina_Diesel_Eletrico_-_Cidade_(km/l)"] = gauss(
-            arq_json[i]["Gasolina_Diesel_Eletrico_-_Cidade_(km/l)"], 10)
-    
-    for i in range(len(arq_json)):
-        arq_json[i]["Gasolina_Diesel_Eletrico_-_Estrada_(km/l)"] = gauss(
-            arq_json[i]["Gasolina_Diesel_Eletrico_-_Estrada_(km/l)"], 10)
+        arq_json[i]["G.E._Gasolina_Diesel_CO2_fossil_(g/km)"] = gauss(
+            arq_json[i]["G.E._Gasolina_Diesel_CO2_fossil_(g/km)"], 10)
 
     print("Dados de emissão atualizados")
 
@@ -54,16 +48,21 @@ if __name__ == "__main__":
         l = arq_json[indexVeiculo]["CO_(mg/km)"]
         m = arq_json[indexVeiculo]["CHO_(mg/km)"]
         n = arq_json[indexVeiculo]["Reducao_Relativa_Ao_Limite"]
-        o = arq_json[indexVeiculo]["G.E._Etanol_CO2_Fossil_(g\/km)"]
+        o = arq_json[indexVeiculo]["G.E._Etanol_CO2_Fossil_(g/km)"]
         p = arq_json[indexVeiculo]["G.E._Gasolina_Diesel_CO2_fossil_(g/km)"]
-        q = arq_json[indexVeiculo]["Etanol_-_Cidade_(kmk/l)"]
-        r = arq_json[indexVeiculo]["Etanol_-_Estrada_(kmk/l)"]
+        q = arq_json[indexVeiculo]["Etanol_-_Cidade_(km/l)"]
+        r = arq_json[indexVeiculo]["Etanol_-_Estrada_(km/l)"]
         s = arq_json[indexVeiculo]["Gasolina_Diesel_Eletrico_-_Cidade_(km/l)"]
         t = arq_json[indexVeiculo]["Gasolina_Diesel_Eletrico_-_Estrada_(km/l)"]
         u = arq_json[indexVeiculo]["Consumo_Energetico_(MJ/km)"]
         v = arq_json[indexVeiculo]["Classificacao_PBE_-_Relativo_na_Categoria"]
         w = arq_json[indexVeiculo]["Classificação_PBE_-_Absoluto_Geral"]
         x = arq_json[indexVeiculo]["Selo_CONPET_de_Eficiencia_Energetica"]
+        
+        if c == "-" or d == "-" or type(b) == int or type(c) == int or type(d) == int or type(e) == int or len(d) < 3:
+            cdg = a[0:3] + b + str(c) + str(d) + str(e) + str(f) + str(g) + str(h) + j[0:3]
+        else:
+            cdg = a[0:3] + b[0:3] + c[0:3] + d[0:3] + str(e) + str(f) + str(g) + str(h) + str(j)
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,
@@ -71,7 +70,7 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarBanco',
-            args=[a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x],
+            args=[cdg.replace(" ", "-"),str(a),str(b),str(c),str(d),str(p)],
             cc_pattern=None))
 
     print("Successo em registrar seu banco de dados!")

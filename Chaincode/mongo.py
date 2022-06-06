@@ -1,12 +1,6 @@
 import couchdb, json
 
-def somar_elementos(lista):
-   soma = 0
-   for numero in lista:
-      soma += numero
-   return soma
-
-distanciaLista = []
+items = []
 couch = couchdb.Server()
 
 if __name__ == "__main__":
@@ -14,22 +8,16 @@ if __name__ == "__main__":
          banco_json = json.loads(arq.read())
 
    # connect to MongoDB
-   server = couchdb.Server('http://192.168.0.105:5984/_utils')
+   server = couchdb.Server('http://localhost:5984/_utils')
    # Acess an existing database
    db = couch['nmi-channel_fabpki']
 
-   for i in banco_json["Modelo_Veiculos"]:
-      for doc in db.find(
-      {
-         "selector": {
-            "IdCdgCategoria": "{}".format(i)
-         }
-      }):
-         query_info = json.dumps(doc, indent=4, sort_keys=True)
-         query_json = json.loads(query_info)
-         distanciaLista.append(query_json["AcumuladorDistancia"])
-      
-   listInt = list(map(float, distanciaLista))
-   distAcumulado = sum(listInt)
-   print(distAcumulado)
+   for doc in db.view('_all_docs'):
+         i = doc['id']
+         if i[0:7] == "travel-":
+            print(i)
+            items.append(i)
+            print(len(items))
+   print(items[0])
+
 

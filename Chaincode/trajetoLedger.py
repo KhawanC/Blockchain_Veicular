@@ -1,4 +1,4 @@
-import random, json
+import random, couchdb
 from hfc.fabric import Client as client_fabric
 import asyncio
 
@@ -6,15 +6,20 @@ domain = "ptb.de"
 channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
+couch = couchdb.Server()
+server = couchdb.Server('http://localhost:5984/_utils')
+db = couch['nmi-channel_fabpki']
+items = []
 
 if __name__ == "__main__":
-
-    #Ler arquivo json e coloca-lo em uma variavel chamada "info"
-    with open('dadosVeicularesAtualizados.json', 'r', encoding='utf-8') as arq_r:
-        info = json.loads(arq_r.read())
     
-    #Variavel que armazenará a quantidade de placas dentro do arquivo json
-    qtd_veiculos_json = len(info["Placas"])
+    #Acesso couchdb e recuperando modelos
+    for doc in db.view('_all_docs'):
+        i = doc['id']
+        if i[0:5] == "user-":
+            items.append(i)
+            
+    loop = asyncio.get_event_loop()
 
     loop = asyncio.get_event_loop()
 
@@ -26,8 +31,8 @@ if __name__ == "__main__":
     c_hlf.new_channel(channel_name)
     
     #Fazer um loop para cada veiculo, associando um trajeto entre 0 e 80 para eles
-    for i in range(qtd_veiculos_json):
-        placa = info["Placas"][str(i)]
+    for i in range(len(items)):
+        placa = items[i]
         distancia = random.randint(0,120)
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
