@@ -45,18 +45,37 @@ func Encode(msg string) string { //Função para criar um hash sha-1
 type SmartContract struct {
 }
 
-type Categoria struct {
-	CdgCategoria string  `json:"CdgCategoria"` // PK
-	Categoria    string  `json:"Categoria"`
-	Marca        string  `json:"Marca"`
-	Versao       string  `json:"Versao"`
-	Modelo       string  `json:"Modelo"`
-	EmissaoPad   float64 `json:"EmissaoPad"`
+type ModeloVeiculo struct {
+	CdgModelo                               string  `json:"CdgModelo"` // PK
+	Categoria                               string  `json:"Categoria"`
+	Marca                                   string  `json:"Marca"`
+	Versao                                  string  `json:"Versao"`
+	Modelo                                  string  `json:"Modelo"`
+	Motor                                   string  `json:"Motor"`
+	Tipo_de_Propulsao                       string  `json:"Tipo_de_Propulsao"`
+	Transmissao_Velocidades                 string  `json:"Transmissao_Velocidades_"`
+	Ar_Condicionado                         string  `json:"Ar_Condicionado"`
+	Direcao_Assistida                       string  `json:"Direcao_Assistida"`
+	Combustivel                             string  `json:"Combustivel"`
+	NMOG_Nox                                float64 `json:"NMOG_Nox"`
+	CO                                      float64 `json:"CO"`
+	CHO                                     float64 `json:"CHO"`
+	Reducao_Relativa_Ao_Limite              string  `json:"Reducao_Relativa_Ao_Limite"`
+	Etanol_CO2_Fossil                       float64 `json:"Etanol_CO2_Fossil"`
+	Gasolina_Diesel_CO2_fossil              float64 `json:"Gasolina_Diesel_CO2_fossil"`
+	Etanol_Cidade                           float64 `json:"Etanol_Cidade"`
+	Etanol_Estrada                          float64 `json:"Etanol_Estrada"`
+	Gasolina_Diesel_Eletrico_Cidade         float64 `json:"Gasolina_Diesel_Eletrico_Cidade"`
+	Gasolina_Diesel_Eletrico_Estrada        float64 `json:"Gasolina_Diesel_Eletrico_Estrada"`
+	Consumo_Energetico                      float64 `json:"Consumo_Energetico"`
+	Classificacao_PBE_Relativo_na_Categoria string  `json:"Classificacao_PBE_Relativo_na_Categoria"`
+	Classificação_PBE_Absoluto_Geral        string  `json:"Classificação_PBE_Absoluto_Geral"`
+	Selo_CONPET_de_Eficiencia_Energetica    string  `json:"Selo_CONPET_de_Eficiencia_Energetica"`
 }
 
 type Usuario struct {
-	Placa               string  `json:"Placa"`          // PK
-	IdCdgCategoria      string  `json:"IdCdgCategoria"` //FK (Categoria)
+	Placa               string  `json:"Placa"`       // PK
+	IdCdgModelo         string  `json:"IdCdgModelo"` //FK (Categoria)
 	AcumuladorDistancia float64 `json:"AcumuladorDistancia"`
 	Co2Emitido          float64 `json:"Co2Emitido"`
 }
@@ -99,26 +118,72 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 	}
 
 	//Inserindo argumentos dentro de variáveis
-	codigo := args[0]
-	categoria := args[1]
-	marca := args[2]
-	versao := args[3]
-	modelo := args[4]
-	emissao := args[5]
+	categoria := args[0]
+	marca := args[1]
+	versao := args[2]
+	modelo := args[3]
+	motor := args[4]
+	tipo_de_Propulsao := args[5]
+	transmissao_Velocidades := args[6]
+	ar_Condicionado := args[7]
+	direcao_Assistida := args[8]
+	combustivel := args[9]
+	nMOG_Nox := args[10]
+	cO := args[11]
+	cHO := args[12]
+	reducao_Relativa_Ao_Limite := args[13]
+	etanol_CO2_Fossil := args[14]
+	gasolina_Diesel_CO2_fossil := args[15]
+	etanol_Cidade := args[16]
+	etanol_Estrada := args[17]
+	gasolina_Diesel_Eletrico_Cidade := args[18]
+	gasolina_Diesel_Eletrico_Estrada := args[19]
+	consumo_Energetico := args[20]
+	classificacao_PBE_Relativo_na_Categoria := args[21]
+	classificação_PBE_Absoluto_Geral := args[22]
+	celo_CONPET_de_Eficiencia_Energetica := args[23]
 
-	emissFloat, err := strconv.ParseFloat(emissao, 64) //Convertendo a emissão para float
+	NMOG_NoxFloat, err := strconv.ParseFloat(nMOG_Nox, 64)
+	cOFloat, err := strconv.ParseFloat(cO, 64)
+	cHOFloat, err := strconv.ParseFloat(cHO, 64)
+	etanol_CO2_FossilFloat, err := strconv.ParseFloat(etanol_CO2_Fossil, 64)
+	gasolina_Diesel_CO2_fossilFloat, err := strconv.ParseFloat(gasolina_Diesel_CO2_fossil, 64)
+	etanol_CidadeFloat, err := strconv.ParseFloat(etanol_Cidade, 64)
+	etanol_EstradaFloat, err := strconv.ParseFloat(etanol_Estrada, 64)
+	gasolina_Diesel_Eletrico_CidadeFloat, err := strconv.ParseFloat(gasolina_Diesel_Eletrico_Cidade, 64)
+	gasolina_Diesel_Eletrico_EstradaFloat, err := strconv.ParseFloat(gasolina_Diesel_Eletrico_Estrada, 64)
+	consumo_EnergeticoFloat, err := strconv.ParseFloat(consumo_Energetico, 64)
 
 	if err != nil {
 		return shim.Error("Houve um problema ao converter o float")
 	}
 
-	var CategoriaInfor = Categoria{ //Inserindo argumentos dentro da Struct Categoria
-		Categoria:    categoria,
-		Marca:        marca,
-		Versao:       versao,
-		Modelo:       modelo,
-		EmissaoPad:   emissFloat,
-		CdgCategoria: codigo,
+	var CategoriaInfor = ModeloVeiculo{ //Inserindo argumentos dentro da Struct Categoria
+		CdgModelo:                               null,
+		Categoria:                               categoria,
+		Marca:                                   marca,
+		Versao:                                  versao,
+		Modelo:                                  modelo,
+		Motor:                                   motor,
+		Tipo_de_Propulsao:                       tipo_de_Propulsao,
+		Transmissao_Velocidades:                 transmissao_Velocidades,
+		Ar_Condicionado:                         ar_Condicionado,
+		Direcao_Assistida:                       direcao_Assistida,
+		Combustivel:                             combustivel,
+		NMOG_Nox:                                NMOG_NoxFloat,
+		CO:                                      cOFloat,
+		CHO:                                     cHOFloat,
+		Reducao_Relativa_Ao_Limite:              reducao_Relativa_Ao_Limite,
+		Etanol_CO2_Fossil:                       etanol_CO2_FossilFloat,
+		Gasolina_Diesel_CO2_fossil:              gasolina_Diesel_CO2_fossilFloat,
+		Etanol_Cidade:                           etanol_CidadeFloat,
+		Etanol_Estrada:                          etanol_EstradaFloat,
+		Gasolina_Diesel_Eletrico_Cidade:         gasolina_Diesel_Eletrico_CidadeFloat,
+		Gasolina_Diesel_Eletrico_Estrada:        gasolina_Diesel_Eletrico_EstradaFloat,
+		Consumo_Energetico:                      consumo_EnergeticoFloat,
+		Classificacao_PBE_Relativo_na_Categoria: classificacao_PBE_Relativo_na_Categoria,
+		Classificação_PBE_Absoluto_Geral:        classificação_PBE_Absoluto_Geral,
+		Selo_CONPET_de_Eficiencia_Energetica:    celo_CONPET_de_Eficiencia_Energetica,
 	}
 
 	CategoriaAsBytes, _ := json.Marshal(CategoriaInfor) //Encapsulando as informações em arquivo JSON
@@ -139,12 +204,12 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	}
 
 	userPlaca := args[0]
-	cdgCategoriaUser := args[1]
+	CdgModeloUser := args[1]
 
 	//Criar Struct para manipular as informações do veículo
 	userVeiculo := Usuario{
 		Placa:               userPlaca,
-		IdCdgCategoria:      cdgCategoriaUser,
+		IdCdgModelo:         CdgModeloUser,
 		AcumuladorDistancia: 0.0,
 		Co2Emitido:          0.0,
 	}
