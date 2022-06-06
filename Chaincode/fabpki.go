@@ -197,11 +197,11 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	usuario.AcumuladorDistancia = distAcumulado
 
 	//Criar assinatura do trajeto
-	trajeto.TrajetoHash = "traj-" + cdgUnico
+	trajeto.TrajetoHash = cdgUnico
 	trajeto.TrajetoDistancia = userDistFLoat
 
 	//Associar trajeto com o usuário
-	trajetoUsuario.Viagem = "traj_user-" + trajeto.TrajetoHash + "-" + usuario.Placa
+	trajetoUsuario.Viagem = trajeto.TrajetoHash + "-" + usuario.Placa
 	trajetoUsuario.IdPlaca = usuario.Placa
 	trajetoUsuario.IdTrajeto = trajeto.TrajetoHash
 
@@ -211,9 +211,12 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	UsuarioTrajetoAsBytes, _ := json.Marshal(trajetoUsuario)
 
 	//Inserindo valor no Ledger
+	idTrajeto := "trajeto-" + trajeto.TrajetoHash
+	idUserTrajeto := "usr_traj-" + trajetoUsuario.Viagem
+
 	stub.PutState(userPlaca, UsuarioAsBytesFinal)
-	stub.PutState(trajeto.TrajetoHash, TrajetoAsBytes)
-	stub.PutState(trajetoUsuario.Viagem, UsuarioTrajetoAsBytes)
+	stub.PutState(idTrajeto, TrajetoAsBytes)
+	stub.PutState(idUserTrajeto, UsuarioTrajetoAsBytes)
 
 	fmt.Println("Sucesso ao registrar trajeto")
 
