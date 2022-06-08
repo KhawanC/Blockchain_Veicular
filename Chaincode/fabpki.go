@@ -46,19 +46,18 @@ type SmartContract struct {
 }
 
 type ModeloVeiculo struct { //"model-"
-	CdgModelo   string  `json:"CdgModelo"` // PK
-	Categoria   string  `json:"Categoria"`
-	Marca       string  `json:"Marca"`
-	Versao      string  `json:"Versao"`
-	Modelo      string  `json:"Modelo"`
-	Emissao_Co2 float64 `json:"Gasolina_Diesel_Eletrico_Estrada"`
+	CdgModelo  string  `json:"CdgModelo"` // PK
+	Categoria  string  `json:"Categoria"`
+	Marca      string  `json:"Marca"`
+	Versao     string  `json:"Versao"`
+	Modelo     string  `json:"Modelo"`
+	EmissaoCo2 float64 `json:"EmissaoCo2"`
 }
 
-type Usuario struct { //"user-"
+type Veiculo struct { //"user-"
 	Placa               string  `json:"Placa"`       // PK
 	IdCdgModelo         string  `json:"IdCdgModelo"` //FK (Categoria)
 	AcumuladorDistancia float64 `json:"AcumuladorDistancia"`
-	Co2Emitido          float64 `json:"Co2Emitido"`
 }
 
 type Trajeto struct { //"traj-"
@@ -66,10 +65,16 @@ type Trajeto struct { //"traj-"
 	TrajetoDistancia float64 `json:"TrajetoDistancia"`
 }
 
-type TrajetoUsuario struct { //"traj_user-"
+type TrajetoVeiculo struct { //"traj_user-"
 	Viagem    string `json:"Viagem"`    // PK
-	IdPlaca   string `json:"IdPlaca"`   //FK (Usuario)
+	IdPlaca   string `json:"IdPlaca"`   //FK (Veiculo)
 	IdTrajeto string `json:"IdTrajeto"` //FK (Trajeto)
+}
+
+type Fabricante struct { //"fab-""
+	Co2Tot          float64 `json:"Co2_Tot"`
+	SaldoCarbono    float64 `json:"SaldoCarbono"`
+	SaldoFiduciario float64 `json:"Saldo_FIduciario"`
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -79,19 +84,21 @@ func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
 func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 	fn, args := stub.GetFunctionAndParameters()
 
-	if fn == "registrarBanco" {
-		return s.registrarBanco(stub, args)
-	} else if fn == "registrarUsuario" {
-		return s.registrarUsuario(stub, args)
+	if fn == "registrarModelo" {
+		return s.registrarModelo(stub, args)
+	} else if fn == "registrarVeiculo" {
+		return s.registrarVeiculo(stub, args)
 	} else if fn == "registrarTrajeto" {
 		return s.registrarTrajeto(stub, args)
+	} else if fn == "registrarFabricante" {
+		return s.registrarFabricante(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
 }
 
 //Função que recebe ./bancoLedger.py e inserer o banco de dados com os veículos
-func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) registrarModelo(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	//Verificando se a quantidade de argumnetos é maior que 6
 	if len(args) != 6 {
@@ -112,28 +119,55 @@ func (s *SmartContract) registrarBanco(stub shim.ChaincodeStubInterface, args []
 		return shim.Error("Houve um problema ao converter o float")
 	}
 
-	var CategoriaInfor = ModeloVeiculo{ //Inserindo argumentos dentro da Struct Categoria
-		CdgModelo:   cdg,
-		Categoria:   categoria,
-		Marca:       marca,
-		Versao:      versao,
-		Modelo:      modelo,
-		Emissao_Co2: emissFloat,
+	var categoriaInfor = ModeloVeiculo{ //Inserindo argumentos dentro da Struct Categoria
+		CdgModelo:  cdg,
+		Categoria:  categoria,
+		Marca:      marca,
+		Versao:     versao,
+		Modelo:     modelo,
+		EmissaoCo2: emissFloat,
 	}
 
-	CategoriaAsBytes, _ := json.Marshal(CategoriaInfor) //Encapsulando as informações em arquivo JSON
+	categoriaAsBytes, _ := json.Marshal(categoriaInfor) //Encapsulando as informações em arquivo JSON
 
 	idCdgLedger := "model-" + cdg
 
-	stub.PutState(idCdgLedger, CategoriaAsBytes) //Inserindo valores no ledger, com uma informação associada à uma chave
+	stub.PutState(idCdgLedger, categoriaAsBytes) //Inserindo valores no ledger, com uma informação associada à uma chave
 
 	//Confirmação do chaincode
 	fmt.Println("Registro de categoria inserido com sucesso")
 	return shim.Success(nil)
 }
 
+func (s *SmartContract) registrarFabricante(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	nomeFab := args[0]
+
+	//Verificando se a quantidade de argumnetos é maior que 6
+	if len(args) != 1 {
+		return shim.Error("Não foi encontrado nenhum argumento. Tente novamente!")
+	}
+
+	var fabricanteInfor = Fabricante{
+		Co2Tot:          0.0,
+		SaldoCarbono:    0.0,
+		SaldoFiduciario: 10000.0,
+	}
+
+	fabricanteAsBytes, _ := json.Marshal(fabricanteInfor) //Encapsulando as informações em arquivo JSON
+
+	idCdgLedger := "fab-" + nomeFab
+
+	stub.PutState(idCdgLedger, fabricanteAsBytes) //Inserindo valores no ledger, com uma informação associada à uma chave
+
+	//Confirmação do chaincode
+	fmt.Println("Registro de categoria inserido com sucesso")
+
+	return shim.Success(nil)
+}
+
 //Função que recebe "./userLedger" e insere o veículo do usuário no Ledger
-func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	//Verificar se existem mais de 2 argumentos no código do cliente
 	if len(args) != 2 {
@@ -144,17 +178,16 @@ func (s *SmartContract) registrarUsuario(stub shim.ChaincodeStubInterface, args 
 	CdgModeloUser := args[1]
 
 	//Criar Struct para manipular as informações do veículo
-	userVeiculo := Usuario{
+	userVeiculo := Veiculo{
 		Placa:               userPlaca,
 		IdCdgModelo:         CdgModeloUser,
 		AcumuladorDistancia: 0.0,
-		Co2Emitido:          0.0,
 	}
 
 	veiculoAsBytes, _ := json.Marshal(userVeiculo)
 
 	//Inserir valores no ledger. ID = placa do veículo
-	idUserVeiculo := "user-" + userPlaca
+	idUserVeiculo := "veic-" + userPlaca
 	stub.PutState(idUserVeiculo, veiculoAsBytes)
 
 	//Confirmação do chaincode
@@ -183,40 +216,40 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	}
 
 	//Criando Struct para encapsular os dados
-	usuario := Usuario{}
-	json.Unmarshal(userAsBytes, &usuario)
+	Veiculo := Veiculo{}
+	json.Unmarshal(userAsBytes, &Veiculo)
 
 	//Criar Struct do trajeto e do usuário
-	trajetoUsuario := TrajetoUsuario{}
+	trajetoVeiculo := TrajetoVeiculo{}
 	trajeto := Trajeto{}
 
-	distAcumulado := usuario.AcumuladorDistancia //Inserindo o acumulador de distância do usuário dentro de uma variável
+	distAcumulado := Veiculo.AcumuladorDistancia //Inserindo o acumulador de distância do usuário dentro de uma variável
 
 	distAcumulado += userDistFLoat //Adicionar a distancia do trajeto feito ao acumulador
 
-	usuario.AcumuladorDistancia = distAcumulado
+	Veiculo.AcumuladorDistancia = distAcumulado
 
 	//Criar assinatura do trajeto
 	trajeto.TrajetoHash = cdgUnico
 	trajeto.TrajetoDistancia = userDistFLoat
 
 	//Associar trajeto com o usuário
-	trajetoUsuario.Viagem = trajeto.TrajetoHash + "-" + usuario.Placa
-	trajetoUsuario.IdPlaca = usuario.Placa
-	trajetoUsuario.IdTrajeto = trajeto.TrajetoHash
+	trajetoVeiculo.Viagem = trajeto.TrajetoHash + "-" + Veiculo.Placa
+	trajetoVeiculo.IdPlaca = Veiculo.Placa
+	trajetoVeiculo.IdTrajeto = trajeto.TrajetoHash
 
 	//Encapsulando dados em arquivo JSON
-	UsuarioAsBytesFinal, _ := json.Marshal(usuario)
+	VeiculoAsBytesFinal, _ := json.Marshal(Veiculo)
 	TrajetoAsBytes, _ := json.Marshal(trajeto)
-	UsuarioTrajetoAsBytes, _ := json.Marshal(trajetoUsuario)
+	VeiculoTrajetoAsBytes, _ := json.Marshal(trajetoVeiculo)
 
 	//Inserindo valor no Ledger
 	idTrajeto := "trajeto-" + trajeto.TrajetoHash
-	idUserTrajeto := "usr_traj-" + trajetoUsuario.Viagem
+	idUserTrajeto := "veic_traj-" + trajetoVeiculo.Viagem
 
-	stub.PutState(userPlaca, UsuarioAsBytesFinal)
+	stub.PutState(userPlaca, VeiculoAsBytesFinal)
 	stub.PutState(idTrajeto, TrajetoAsBytes)
-	stub.PutState(idUserTrajeto, UsuarioTrajetoAsBytes)
+	stub.PutState(idUserTrajeto, VeiculoTrajetoAsBytes)
 
 	fmt.Println("Sucesso ao registrar trajeto")
 

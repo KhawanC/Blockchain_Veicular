@@ -93,7 +93,7 @@ if __name__ == "__main__":
             peers=[callpeer],
             cc_name=cc_name,
             cc_version=cc_version,
-            fcn='registrarUsuario',
+            fcn='registrarVeiculo',
             args=[bancoPlacas[i], items[x]],
             cc_pattern=None))
         

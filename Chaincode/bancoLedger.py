@@ -1,4 +1,4 @@
-import sys, json, asyncio
+import json, asyncio, secrets
 from random import gauss
 from hfc.fabric import Client as client_fabric
 
@@ -6,7 +6,7 @@ domain = "ptb.de"
 channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
-
+montadoras = []
 
 if __name__ == "__main__":
     # Salvar json de dados veicular em uma variavel de nome arq_json
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     c_hlf.new_channel(channel_name)
 
-    for indexVeiculo in range(len(arq_json)):
+    for indexVeiculo in range(len(arq_json)):        
         a = arq_json[indexVeiculo]["Categoria"]
         b = arq_json[indexVeiculo]["Marca"]
         c = arq_json[indexVeiculo]["Modelo"]
@@ -50,6 +50,8 @@ if __name__ == "__main__":
         n = arq_json[indexVeiculo]["Reducao_Relativa_Ao_Limite"]
         o = arq_json[indexVeiculo]["G.E._Etanol_CO2_Fossil_(g/km)"]
         p = arq_json[indexVeiculo]["G.E._Gasolina_Diesel_CO2_fossil_(g/km)"]
+        if f == "Eletrico" or p == 0: #Verificar se o carro é Elétrico, caso seja, ignore
+            continue
         q = arq_json[indexVeiculo]["Etanol_-_Cidade_(km/l)"]
         r = arq_json[indexVeiculo]["Etanol_-_Estrada_(km/l)"]
         s = arq_json[indexVeiculo]["Gasolina_Diesel_Eletrico_-_Cidade_(km/l)"]
@@ -59,18 +61,44 @@ if __name__ == "__main__":
         w = arq_json[indexVeiculo]["Classificação_PBE_-_Absoluto_Geral"]
         x = arq_json[indexVeiculo]["Selo_CONPET_de_Eficiencia_Energetica"]
         
-        if c == "-" or d == "-" or type(b) == int or type(c) == int or type(d) == int or type(e) == int or len(d) < 3:
-            cdg = a[0:3] + b + str(c) + str(d) + str(e) + str(f) + str(g) + str(h) + j[0:3]
-        else:
-            cdg = a[0:3] + b[0:3] + c[0:3] + d[0:3] + str(e) + str(f) + str(g) + str(h) + str(j)
+        carroExiste = False
+        
+        for i in montadoras: #Loop para inserir o nome da montadora, caso esse nome estaja nao esteja lista de montadora é ecessário inserir, caso o contrário não é necessário
+            if i == b:
+                carroExiste = True
+        if carroExiste == False:
+            montadoras.append(b)
+        
+        cdg = a[0:3] + b + str(c) + str(e) + f[0:3] + str(g) + str(h) + j + secrets.token_urlsafe(16)
+
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,
             peers=[callpeer],
             cc_name=cc_name,
             cc_version=cc_version,
-            fcn='registrarBanco',
+            fcn='registrarModelo',
             args=[cdg.replace(" ", "-"),str(a),str(b),str(c),str(d),str(p)],
             cc_pattern=None))
 
+    for i in montadoras:
+        loop = asyncio.get_event_loop()
+
+        c_hlf = client_fabric(net_profile=(domain + ".json"))
+
+        admin = c_hlf.get_user(domain, 'Admin')
+        callpeer = "peer0." + domain
+
+        c_hlf.new_channel(channel_name)
+        
+        response = loop.run_until_complete(c_hlf.chaincode_invoke(
+            requestor=admin,
+            channel_name=channel_name,
+            peers=[callpeer],
+            cc_name=cc_name,
+            cc_version=cc_version,
+            fcn='registrarFabricante',
+            args=[i],
+            cc_pattern=None))
+        
     print("Successo em registrar seu banco de dados!")

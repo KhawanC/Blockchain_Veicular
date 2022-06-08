@@ -19,11 +19,15 @@
 # with open('dadosVeicularesAtualizados.json', 'w', encoding='utf8') as arq:
 #     json.dump(arq_json, arq, indent=2, separators=(',', ': '), ensure_ascii=False)
 
-nome = "KauaCassiano"
-numero = 0
-nome2 = "Ki"
-if type(numero) == int:
-    print("numero é um numero")
-if len(nome2) < 3:
-    print("nome 2 tem menos que 2 digitos")
-print(nome[0:3] + str(numero) + nome2[0:2])
+
+montadoras = ["Volks", "Fiat"]
+carroExiste = False
+novoCarro = "Volks"
+for i in montadoras:
+    print(i + " - " + "Novo carro: " + novoCarro)
+    if i == novoCarro:
+        carroExiste = True
+print(montadoras)
+if carroExiste == False:
+    montadoras.append(novoCarro)
+print(montadoras)
