@@ -16,7 +16,7 @@ if __name__ == "__main__":
     #Acesso couchdb e recuperando modelos
     for doc in db.view('_all_docs'):
         i = doc['id']
-        if i[0:5] == "user-":
+        if i[0:5] == "veic-":
             items.append(i)
             
     loop = asyncio.get_event_loop()

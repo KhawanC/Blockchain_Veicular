@@ -1,4 +1,4 @@
-import couchdb
+import couchdb, asyncio
 from random import gauss
 from hfc.fabric import Client as client_fabric
 
@@ -6,7 +6,7 @@ domain = "ptb.de"
 channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
-server = couchdb.Server('http://localhost:5984/_utils')
+couch = couchdb.Server()
 db = couch['nmi-channel_fabpki']
 items = []
 
@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     for doc in db.view('_all_docs'):
         i = doc['id']
-        if i[0:4] == "veic-":
+        if i[0:5] == "veic-":
             items.append(i)
     
     loop = asyncio.get_event_loop()
@@ -33,6 +33,7 @@ if __name__ == "__main__":
                 peers=[callpeer],
                 cc_name=cc_name,
                 cc_version=cc_version,
-                fcn='registrarModelo',
+                fcn='registrarCarbono',
                 args=[i],
                 cc_pattern=None))
+    print("Saldo de carbono atualizado com sucesso")

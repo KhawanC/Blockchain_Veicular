@@ -131,8 +131,7 @@ func (s *SmartContract) registrarModelo(stub shim.ChaincodeStubInterface, args [
 
 	stub.PutState(idCdgLedger, categoriaAsBytes) //Inserindo valores no ledger, com uma informação associada à uma chave
 
-	//Confirmação do chaincode
-	fmt.Println("Registro de categoria inserido com sucesso")
+	fmt.Println("Sucesso ao registrar  modelo de veiculo")
 	return shim.Success(nil)
 }
 
@@ -140,7 +139,7 @@ func (s *SmartContract) registrarFabricante(stub shim.ChaincodeStubInterface, ar
 
 	nomeFab := args[0]
 
-	//Verificando se a quantidade de argumnetos é maior que 6
+	//Verificando se a quantidade de argumnetos é maior que 1
 	if len(args) != 1 {
 		return shim.Error("Não foi encontrado nenhum argumento. Tente novamente!")
 	}
@@ -157,9 +156,7 @@ func (s *SmartContract) registrarFabricante(stub shim.ChaincodeStubInterface, ar
 
 	stub.PutState(idCdgLedger, fabricanteAsBytes) //Inserindo valores no ledger, com uma informação associada à uma chave
 
-	//Confirmação do chaincode
-	fmt.Println("Registro de categoria inserido com sucesso")
-
+	fmt.Println("Sucesso ao registrar fabricantes")
 	return shim.Success(nil)
 }
 
@@ -186,8 +183,7 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 	idUserVeiculo := "veic-" + userPlaca
 	stub.PutState(idUserVeiculo, veiculoAsBytes)
 
-	//Confirmação do chaincode
-	fmt.Println("Registro de usuário inserido com sucesso")
+	fmt.Println("Sucesso ao registrar veiculo")
 	return shim.Success(nil)
 }
 
@@ -247,7 +243,6 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	stub.PutState(idUsuarioTrajeto, veiculoTrajetoAsBytes)
 
 	fmt.Println("Sucesso ao registrar trajeto")
-
 	return shim.Success(nil)
 }
 
@@ -289,7 +284,9 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 	fabricante := Fabricante{}
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
-	fabricante.Co2Tot += (veiculo.AcumuladorDistancia * modelo.EmissaoCo2)
+	co2Veiculo := veiculo.AcumuladorDistancia * modelo.EmissaoCo2
+	fabricante.Co2Tot += co2Veiculo
+	veiculo.AcumuladorDistancia = 0.0
 
 	//Encapsulando dados em arquivo JSON
 	veiculoAsBytesFinal, _ := json.Marshal(veiculo)
@@ -300,6 +297,7 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 	stub.PutState(idModelo, modeloAsBytesFinal)
 	stub.PutState(idFaricante, fabricanteAsBytesFinal)
 
+	fmt.Println("Sucesso ao computador co2 dos fabricantes")
 	return shim.Success(nil)
 }
 

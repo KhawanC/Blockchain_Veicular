@@ -29,7 +29,7 @@ bancoPlacas = []
 if __name__ == "__main__":
 
     #Loop para criar 10 placas
-    for i in range(0, 200):
+    for i in range(0, 50):
         
         #Criar uma lista para inserir as letras/numeros no padrão Mercosul (AAA1A11)
         placa = []
