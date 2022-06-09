@@ -8,17 +8,17 @@ cc_name = "fabpki"
 cc_version = "1.0"
 couch = couchdb.Server()
 db = couch['nmi-channel_fabpki']
-veiculos = []
-fabricantes = []
+listaVeiculos = []
+listaFabricantes = []
 
 if __name__ == "__main__":
 
     for doc in db.view('_all_docs'):
         i = doc['id']
         if i[0:5] == "veic-":
-            veiculos.append(i)
+            listaVeiculos.append(i)
         if i[0:4] == "fab-":
-            fabricantes.append(i)
+            listaFabricantes.append(i)
     
     loop = asyncio.get_event_loop()
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     c_hlf.new_channel(channel_name)
 
-    for i in veiculos:
+    for i in listaVeiculos:
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
                 requestor=admin,
                 channel_name=channel_name,
@@ -40,7 +40,9 @@ if __name__ == "__main__":
                 args=[i],
                 cc_pattern=None))
 
-    for i in fabricantes:
+    print("Quantidade de carbono emitido atualizado com sucesso")
+
+    for i in listaFabricantes:
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
                 requestor=admin,
                 channel_name=channel_name,

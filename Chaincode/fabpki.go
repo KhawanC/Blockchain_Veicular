@@ -42,6 +42,11 @@ func Encode(msg string) string { //Função para criar um hash sha-1
 	return sha1_hash
 }
 
+func Arredondar(n float64) float64 {
+	numeroArredondado := float64(int(n*10000)) / 10000
+	return numeroArredondado
+}
+
 type SmartContract struct {
 }
 
@@ -114,6 +119,7 @@ func (s *SmartContract) registrarModelo(stub shim.ChaincodeStubInterface, args [
 	emissao_co2 := args[5]
 
 	emissFloat, err := strconv.ParseFloat(emissao_co2, 64)
+	emissArredondado := Arredondar(emissFloat)
 
 	if err != nil {
 		return shim.Error("Houve um problema ao converter o float")
@@ -124,7 +130,7 @@ func (s *SmartContract) registrarModelo(stub shim.ChaincodeStubInterface, args [
 		Marca:      marca,
 		Versao:     versao,
 		Modelo:     modelo,
-		EmissaoCo2: emissFloat,
+		EmissaoCo2: emissArredondado,
 	}
 
 	categoriaAsBytes, _ := json.Marshal(categoriaInfor) //Encapsulando as informações em arquivo JSON
@@ -287,7 +293,8 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
 	co2Veiculo := veiculo.AcumuladorDistancia * modelo.EmissaoCo2
-	fabricante.Co2Tot += co2Veiculo
+	co2VeiculoArredondado := Arredondar(co2Veiculo)
+	fabricante.Co2Tot += co2VeiculoArredondado
 	veiculo.AcumuladorDistancia = 0.0
 
 	//Encapsulando dados em arquivo JSON
@@ -317,19 +324,24 @@ func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args 
 	fabricante := Fabricante{}
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
-	if fabricante.Co2Tot == 0.0 {
+	if fabricante.Co2Tot == 0 {
 		fmt.Println("Não foi computado emissão de carbono para o fabricante: " + idFabricante)
 		return shim.Success(nil)
 	}
 
-	fabricante.SaldoCarbono = fabricante.Co2Tot - 4000.00
+	saldo := 50000.0 - fabricante.Co2Tot
+	fabricante.SaldoCarbono = saldo
 	fabricante.Co2Tot = 0
+
+	fabricante.Co2Tot = fabricante.Co2Tot
+	fabricante.SaldoCarbono = fabricante.SaldoCarbono
+	fabricante.SaldoFiduciario = fabricante.SaldoFiduciario
 
 	fabricanteAsBytesFinal, _ := json.Marshal(fabricante)
 
 	stub.PutState(idFabricante, fabricanteAsBytesFinal)
 
-	fmt.Println("Saldo de carbono computado com sucesso")
+	fmt.Println("Saldo de carbono computado com sucesso: " + idFabricante)
 	return shim.Success(nil)
 }
 

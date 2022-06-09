@@ -6,7 +6,7 @@ domain = "ptb.de"
 channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
-montadoras = []
+listaMontadoras = []
 
 if __name__ == "__main__":
     # Salvar json de dados veicular em uma variavel de nome arq_json
@@ -63,11 +63,11 @@ if __name__ == "__main__":
         
         carroExiste = False
         
-        for i in montadoras: #Loop para inserir o nome da montadora, caso esse nome estaja nao esteja lista de montadora é ecessário inserir, caso o contrário não é necessário
+        for i in listaMontadoras: #Loop para inserir o nome da montadora, caso esse nome estaja nao esteja lista de montadora é ecessário inserir, caso o contrário não é necessário
             if i == b:
                 carroExiste = True
         if carroExiste == False:
-            montadoras.append(b)
+            listaMontadoras.append(b)
         
         cdg = a[0:3] + b + str(c) + str(e) + f[0:3] + str(g) + str(h) + j + secrets.token_urlsafe(16)
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
             args=[cdg.replace(" ", "-"),str(a),str(b),str(c),str(d),str(p)],
             cc_pattern=None))
 
-    for i in montadoras:
+    for i in listaMontadoras:
         loop = asyncio.get_event_loop()
 
         c_hlf = client_fabric(net_profile=(domain + ".json"))
@@ -98,7 +98,7 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarFabricante',
-            args=[i],
+            args=[i.replace(" ", "-")],
             cc_pattern=None))
         
     print("Successo em registrar seu banco de dados!")

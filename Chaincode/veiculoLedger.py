@@ -16,15 +16,13 @@ cc_version = "1.0"
 couch = couchdb.Server()
 server = couchdb.Server('http://localhost:5984/_utils')
 db = couch['nmi-channel_fabpki']
-items = []
+listaModelos = []
+listaPlacas = []
 
 # Variáveis para verificação da placa
 nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
           'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-
-#Lista para armazenar todas as placas criadas
-bancoPlacas = []
 
 if __name__ == "__main__":
 
@@ -65,16 +63,16 @@ if __name__ == "__main__":
         placaCompleto = "".join(placa)
         
         #Inserindo a placa na lista de placas 
-        bancoPlacas.append(placaCompleto)
+        listaPlacas.append(placaCompleto)
     
     #Iniciando função para verificar se há duplicadas
-    removerDuplicados(bancoPlacas)
+    removerDuplicados(listaPlacas)
     
     #Acesso couchdb e recuperando modelos
     for doc in db.view('_all_docs'):
         i = doc['id']
         if i[0:6] == "model-":
-            items.append(i)
+            listaModelos.append(i)
     loop = asyncio.get_event_loop()
 
     c_hlf = client_fabric(net_profile=(domain + ".json"))
@@ -85,8 +83,8 @@ if __name__ == "__main__":
     c_hlf.new_channel(channel_name)
 
     #Loop para enviar ao chaincode cada placa 
-    for i in range(len(bancoPlacas)):
-        x = random.randint(0, (len(items)-1))
+    for i in range(len(listaPlacas)):
+        x = random.randint(0, (len(listaModelos)-1))
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
             requestor=admin,
             channel_name=channel_name,
@@ -94,7 +92,7 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarVeiculo',
-            args=[bancoPlacas[i], items[x]],
+            args=[listaPlacas[i], listaModelos[x]],
             cc_pattern=None))
         
     print("Veiculos registrado com sucesso !")
