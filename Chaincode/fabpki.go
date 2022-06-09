@@ -90,6 +90,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 		return s.registrarFabricante(stub, args)
 	} else if fn == "registrarCarbono" {
 		return s.registrarCarbono(stub, args)
+	} else if fn == "registrarCredito" {
+		return s.registrarCredito(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
@@ -272,10 +274,10 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 	modelo := ModeloVeiculo{}
 	json.Unmarshal(modeloAsBytes, &modelo)
 
-	idFaricante := "fab-" + modelo.Marca
+	idFabricante := "fab-" + modelo.Marca
 
 	//Recuperando dados do Faricante
-	fabricanteAsBytes, err := stub.GetState(idFaricante)
+	fabricanteAsBytes, err := stub.GetState(idFabricante)
 	if err != nil || fabricanteAsBytes == nil {
 		return shim.Error("Esse fabricante não existe.")
 	}
@@ -295,9 +297,39 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 
 	stub.PutState(idPlaca, veiculoAsBytesFinal)
 	stub.PutState(idModelo, modeloAsBytesFinal)
-	stub.PutState(idFaricante, fabricanteAsBytesFinal)
+	stub.PutState(idFabricante, fabricanteAsBytesFinal)
 
 	fmt.Println("Sucesso ao computador co2 dos fabricantes")
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	idFabricante := args[0]
+
+	//Recuperando dados do usuário
+	fabricanteAsBytes, err := stub.GetState(idFabricante)
+	if err != nil || fabricanteAsBytes == nil {
+		return shim.Error("Seu fabricante não existe.")
+	}
+
+	//Criando Struct para encapsular os dados do veiculo
+	fabricante := Fabricante{}
+	json.Unmarshal(fabricanteAsBytes, &fabricante)
+
+	if fabricante.Co2Tot == 0.0 {
+		fmt.Println("Não foi computado emissão de carbono para o fabricante: " + idFabricante)
+		return shim.Success(nil)
+	}
+
+	fabricante.SaldoCarbono = fabricante.Co2Tot - 4000.00
+	fabricante.Co2Tot = 0
+
+	fabricanteAsBytesFinal, _ := json.Marshal(fabricante)
+
+	stub.PutState(idFabricante, fabricanteAsBytesFinal)
+
+	fmt.Println("Saldo de carbono computado com sucesso")
 	return shim.Success(nil)
 }
 
