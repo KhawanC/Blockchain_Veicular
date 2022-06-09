@@ -46,7 +46,6 @@ type SmartContract struct {
 }
 
 type ModeloVeiculo struct { //"model-"
-	CdgModelo  string  `json:"CdgModelo"` // PK
 	Categoria  string  `json:"Categoria"`
 	Marca      string  `json:"Marca"`
 	Versao     string  `json:"Versao"`
@@ -55,18 +54,15 @@ type ModeloVeiculo struct { //"model-"
 }
 
 type Veiculo struct { //"user-"
-	Placa               string  `json:"Placa"`       // PK
 	IdCdgModelo         string  `json:"IdCdgModelo"` //FK (Categoria)
 	AcumuladorDistancia float64 `json:"AcumuladorDistancia"`
 }
 
 type Trajeto struct { //"traj-"
-	TrajetoHash      string  `json:"TrajetoHash"` // PK
 	TrajetoDistancia float64 `json:"TrajetoDistancia"`
 }
 
 type TrajetoVeiculo struct { //"traj_user-"
-	Viagem    string `json:"Viagem"`    // PK
 	IdPlaca   string `json:"IdPlaca"`   //FK (Veiculo)
 	IdTrajeto string `json:"IdTrajeto"` //FK (Trajeto)
 }
@@ -92,6 +88,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 		return s.registrarTrajeto(stub, args)
 	} else if fn == "registrarFabricante" {
 		return s.registrarFabricante(stub, args)
+	} else if fn == "registrarCarbono" {
+		return s.registrarCarbono(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
@@ -120,7 +118,6 @@ func (s *SmartContract) registrarModelo(stub shim.ChaincodeStubInterface, args [
 	}
 
 	var categoriaInfor = ModeloVeiculo{ //Inserindo argumentos dentro da Struct Categoria
-		CdgModelo:  cdg,
 		Categoria:  categoria,
 		Marca:      marca,
 		Versao:     versao,
@@ -179,7 +176,6 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 
 	//Criar Struct para manipular as informações do veículo
 	userVeiculo := Veiculo{
-		Placa:               userPlaca,
 		IdCdgModelo:         CdgModeloUser,
 		AcumuladorDistancia: 0.0,
 	}
@@ -203,55 +199,106 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	}
 
 	//Dar nome aos argumentos
-	userPlaca := args[0]
+	idPlaca := args[0]
 	userDistancia := args[1]
 
-	cdgUnico := Encode(AleatString(20))                         //Criando código unico para Struct trajeto
+	cdgUnicoTrajeto := Encode(AleatString(20))                  //Criando código unico para Struct trajeto
+	cdgUnicoUsuarioTrajeto := Encode(AleatString(20))           //Criando código unico para Struct trajeto
 	userDistFLoat, err := strconv.ParseFloat(userDistancia, 64) //Convertendo a distância recebida para float
 
 	//Recuperando dados do usuário
-	userAsBytes, err := stub.GetState(userPlaca)
+	userAsBytes, err := stub.GetState(idPlaca)
 	if err != nil || userAsBytes == nil {
 		return shim.Error("Sua placa não existe.")
 	}
 
 	//Criando Struct para encapsular os dados
-	Veiculo := Veiculo{}
-	json.Unmarshal(userAsBytes, &Veiculo)
+	veiculo := Veiculo{}
+	json.Unmarshal(userAsBytes, &veiculo)
 
 	//Criar Struct do trajeto e do usuário
 	trajetoVeiculo := TrajetoVeiculo{}
 	trajeto := Trajeto{}
 
-	distAcumulado := Veiculo.AcumuladorDistancia //Inserindo o acumulador de distância do usuário dentro de uma variável
+	distAcumulado := veiculo.AcumuladorDistancia //Inserindo o acumulador de distância do usuário dentro de uma variável
 
 	distAcumulado += userDistFLoat //Adicionar a distancia do trajeto feito ao acumulador
 
-	Veiculo.AcumuladorDistancia = distAcumulado
+	veiculo.AcumuladorDistancia = distAcumulado
 
 	//Criar assinatura do trajeto
-	trajeto.TrajetoHash = cdgUnico
 	trajeto.TrajetoDistancia = userDistFLoat
 
 	//Associar trajeto com o usuário
-	trajetoVeiculo.Viagem = trajeto.TrajetoHash + "-" + Veiculo.Placa
-	trajetoVeiculo.IdPlaca = Veiculo.Placa
-	trajetoVeiculo.IdTrajeto = trajeto.TrajetoHash
+	trajetoVeiculo.IdPlaca = idPlaca
+	trajetoVeiculo.IdTrajeto = "trajeto-" + cdgUnicoTrajeto
 
 	//Encapsulando dados em arquivo JSON
-	VeiculoAsBytesFinal, _ := json.Marshal(Veiculo)
-	TrajetoAsBytes, _ := json.Marshal(trajeto)
-	VeiculoTrajetoAsBytes, _ := json.Marshal(trajetoVeiculo)
+	veiculoAsBytesFinal, _ := json.Marshal(veiculo)
+	trajetoAsBytes, _ := json.Marshal(trajeto)
+	veiculoTrajetoAsBytes, _ := json.Marshal(trajetoVeiculo)
 
 	//Inserindo valor no Ledger
-	idTrajeto := "trajeto-" + trajeto.TrajetoHash
-	idUserTrajeto := "veic_traj-" + trajetoVeiculo.Viagem
+	idTrajeto := "trajeto-" + cdgUnicoTrajeto
+	idUsuarioTrajeto := "veic_traj-" + cdgUnicoUsuarioTrajeto
 
-	stub.PutState(userPlaca, VeiculoAsBytesFinal)
-	stub.PutState(idTrajeto, TrajetoAsBytes)
-	stub.PutState(idUserTrajeto, VeiculoTrajetoAsBytes)
+	stub.PutState(idPlaca, veiculoAsBytesFinal)
+	stub.PutState(idTrajeto, trajetoAsBytes)
+	stub.PutState(idUsuarioTrajeto, veiculoTrajetoAsBytes)
 
 	fmt.Println("Sucesso ao registrar trajeto")
+
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	idPlaca := args[0]
+
+	//Recuperando dados do usuário
+	userAsBytes, err := stub.GetState(idPlaca)
+	if err != nil || userAsBytes == nil {
+		return shim.Error("Sua placa não existe.")
+	}
+
+	//Criando Struct para encapsular os dados do veiculo
+	veiculo := Veiculo{}
+	json.Unmarshal(userAsBytes, &veiculo)
+
+	idModelo := veiculo.IdCdgModelo
+
+	//Recuperando dados do Modelo
+	modeloAsBytes, err := stub.GetState(idModelo)
+	if err != nil || modeloAsBytes == nil {
+		return shim.Error("Esse modelo não existe.")
+	}
+
+	//Criando Struct para encapsular os dados dp modelo
+	modelo := ModeloVeiculo{}
+	json.Unmarshal(modeloAsBytes, &modelo)
+
+	idFaricante := "fab-" + modelo.Marca
+
+	//Recuperando dados do Faricante
+	fabricanteAsBytes, err := stub.GetState(idFaricante)
+	if err != nil || fabricanteAsBytes == nil {
+		return shim.Error("Esse fabricante não existe.")
+	}
+
+	//Criando Struct para encapsular os dados dp modelo
+	fabricante := Fabricante{}
+	json.Unmarshal(fabricanteAsBytes, &fabricante)
+
+	fabricante.Co2Tot += (veiculo.AcumuladorDistancia * modelo.EmissaoCo2)
+
+	//Encapsulando dados em arquivo JSON
+	veiculoAsBytesFinal, _ := json.Marshal(veiculo)
+	modeloAsBytesFinal, _ := json.Marshal(modelo)
+	fabricanteAsBytesFinal, _ := json.Marshal(fabricante)
+
+	stub.PutState(idPlaca, veiculoAsBytesFinal)
+	stub.PutState(idModelo, modeloAsBytesFinal)
+	stub.PutState(idFaricante, fabricanteAsBytesFinal)
 
 	return shim.Success(nil)
 }
