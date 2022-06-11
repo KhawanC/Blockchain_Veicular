@@ -78,6 +78,15 @@ type Fabricante struct { //"fab-""
 	SaldoFiduciario float64 `json:"Saldo_FIduciario"`
 }
 
+type OrdemTransacao struct {
+	proprietarioOrdem string  `json:"proprietarioOrdem"` // FK (Veiculo)
+	tipoTransacao     string  `json:"tipoTransacao"`     // 1: Vender carbono -- 2: Comprar carbono
+	saldoOfertado     float64 `json:"saldoOfertado"`
+	idComprador       string  `json:"idComprador"`
+	valorLance        float64 `json:"valorLance"`
+	statusOrdem       string  `json:"statusOrdem"` // Recente - Andamento - Fechado
+}
+
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
 	return shim.Success(nil)
 }
@@ -97,6 +106,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 		return s.registrarCarbono(stub, args)
 	} else if fn == "registrarCredito" {
 		return s.registrarCredito(stub, args)
+	} else if fn == "anunciarOrdem" {
+		return s.anunciarOrdem(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
@@ -256,6 +267,11 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 
 func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
+	//Verificar se arquivo py retornou 1 argumento
+	if len(args) != 1 {
+		return shim.Error("Era esperado 1 único argumento... Tente novamente!")
+	}
+
 	idPlaca := args[0]
 
 	//Recuperando dados do usuário
@@ -312,6 +328,11 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 
 func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
+	//Verificar se arquivo py retornou 1 argumento
+	if len(args) != 1 {
+		return shim.Error("Era esperado 1 único argumento... Tente novamente!")
+	}
+
 	idFabricante := args[0]
 
 	//Recuperando dados do usuário
@@ -329,7 +350,7 @@ func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args 
 		return shim.Success(nil)
 	}
 
-	saldo := 50000.0 - fabricante.Co2Tot
+	var saldo = 50000.0 - fabricante.Co2Tot
 	fabricante.SaldoCarbono = saldo
 	fabricante.Co2Tot = 0
 
@@ -342,6 +363,68 @@ func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args 
 	stub.PutState(idFabricante, fabricanteAsBytesFinal)
 
 	fmt.Println("Saldo de carbono computado com sucesso: " + idFabricante)
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	//Verificar se arquivo py retornou 3 argumento
+	if len(args) != 3 {
+		return shim.Error("Era esperado 3 único argumento... Tente novamente!")
+	}
+
+	fmt.Println("")
+
+	nomeFabricante := args[0]
+	tipoTransacao := args[1]
+	saldoOferta := args[2]
+	fmt.Println("--------")
+	fmt.Println(nomeFabricante + "/---/" + saldoOferta + "/---/" + tipoTransacao + "/---/")
+
+	saldoOfertaFLoat, err := strconv.ParseFloat(saldoOferta, 64)
+
+	//Verificando se o fabricante realmente existe
+	idFabricanteCompleto := "fab-" + nomeFabricante
+	fabricanteAsBytes, err := stub.GetState(idFabricanteCompleto)
+	if err != nil || fabricanteAsBytes == nil {
+		return shim.Error("Seu fabricante não existe.")
+	}
+
+	//Criando Struct para encapsular os dados do fabricante
+	fabricante := Fabricante{}
+	json.Unmarshal(fabricanteAsBytes, &fabricante)
+
+	if tipoTransacao == "vender" {
+		if saldoOfertaFLoat > fabricante.SaldoCarbono {
+			return shim.Error("Você não tem saldo de carbono suficiente")
+		}
+		fabricante.SaldoCarbono -= saldoOfertaFLoat
+	}
+
+	if tipoTransacao == "comprar" {
+		if saldoOfertaFLoat > fabricante.SaldoFiduciario {
+			return shim.Error("Você não tem saldo fiduciario suficiente")
+		}
+		fabricante.SaldoFiduciario -= saldoOfertaFLoat
+	}
+
+	var ordemVenda = OrdemTransacao{
+		proprietarioOrdem: idFabricanteCompleto,
+		tipoTransacao:     tipoTransacao,
+		saldoOfertado:     saldoOfertaFLoat,
+		statusOrdem:       "Recente",
+	}
+
+	ordemAsBytes, _ := json.Marshal(ordemVenda)
+	fabricanteAsBytesFInal, _ := json.Marshal(fabricante)
+
+	idOrdem := "trans-" + nomeFabricante + Encode(AleatString(10))
+
+	stub.PutState(idOrdem, ordemAsBytes)
+
+	stub.PutState(idFabricanteCompleto, fabricanteAsBytesFInal)
+
+	fmt.Println("Ordem de " + tipoTransacao + " anunciado com sucesso!")
 	return shim.Success(nil)
 }
 

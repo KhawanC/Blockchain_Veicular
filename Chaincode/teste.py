@@ -19,15 +19,11 @@
 # with open('dadosVeicularesAtualizados.json', 'w', encoding='utf8') as arq:
 #     json.dump(arq_json, arq, indent=2, separators=(',', ': '), ensure_ascii=False)
 
-
 montadoras = ["Volks", "Fiat"]
-carroExiste = False
-novoCarro = "Volks"
-for i in montadoras:
-    print(i + " - " + "Novo carro: " + novoCarro)
-    if i == novoCarro:
-        carroExiste = True
-print(montadoras)
-if carroExiste == False:
-    montadoras.append(novoCarro)
+novoCarro = "Volkies"
+
+montadoras.append("isso")
+montadoras.append("eh")
+montadoras.append("um")
+montadoras.append("teste")
 print(montadoras)

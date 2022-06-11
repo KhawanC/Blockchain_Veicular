@@ -67,7 +67,7 @@ if __name__ == "__main__":
             if i == b:
                 carroExiste = True
         if carroExiste == False:
-            listaMontadoras.append(b)
+            listaMontadoras.append(b.upper())
         
         cdg = a[0:3] + b + str(c) + str(e) + f[0:3] + str(g) + str(h) + j + secrets.token_urlsafe(16)
 
@@ -82,13 +82,11 @@ if __name__ == "__main__":
             cc_pattern=None))
 
     for i in listaMontadoras:
+        
         loop = asyncio.get_event_loop()
-
         c_hlf = client_fabric(net_profile=(domain + ".json"))
-
         admin = c_hlf.get_user(domain, 'Admin')
         callpeer = "peer0." + domain
-
         c_hlf.new_channel(channel_name)
         
         response = loop.run_until_complete(c_hlf.chaincode_invoke(
