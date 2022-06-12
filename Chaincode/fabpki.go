@@ -51,20 +51,20 @@ type SmartContract struct {
 }
 
 type ModeloVeiculo struct { //"model-"
-	Categoria  string  `json:"Categoria"`
-	Marca      string  `json:"Marca"`
-	Versao     string  `json:"Versao"`
-	Modelo     string  `json:"Modelo"`
-	EmissaoCo2 float64 `json:"EmissaoCo2"`
+	Categoria  string `json:"Categoria"`
+	Marca      string `json:"Marca"`
+	Versao     string `json:"Versao"`
+	Modelo     string `json:"Modelo"`
+	EmissaoCo2 string `json:"EmissaoCo2"`
 }
 
 type Veiculo struct { //"user-"
-	IdCdgModelo         string  `json:"IdCdgModelo"` //FK (Categoria)
-	AcumuladorDistancia float64 `json:"AcumuladorDistancia"`
+	IdCdgModelo         string `json:"IdCdgModelo"` //FK (Categoria)
+	AcumuladorDistancia string `json:"AcumuladorDistancia"`
 }
 
 type Trajeto struct { //"traj-"
-	TrajetoDistancia float64 `json:"TrajetoDistancia"`
+	TrajetoDistancia string `json:"TrajetoDistancia"`
 }
 
 type TrajetoVeiculo struct { //"traj_user-"
@@ -73,18 +73,18 @@ type TrajetoVeiculo struct { //"traj_user-"
 }
 
 type Fabricante struct { //"fab-""
-	Co2Tot          float64 `json:"Co2_Tot"`
-	SaldoCarbono    float64 `json:"SaldoCarbono"`
-	SaldoFiduciario float64 `json:"Saldo_FIduciario"`
+	Co2Tot          string `json:"Co2_Tot"`
+	SaldoCarbono    string `json:"SaldoCarbono"`
+	SaldoFiduciario string `json:"Saldo_FIduciario"`
 }
 
 type OrdemTransacao struct {
-	proprietarioOrdem string  `json:"proprietarioOrdem"` // FK (Veiculo)
-	tipoTransacao     string  `json:"tipoTransacao"`     // 1: Vender carbono -- 2: Comprar carbono
-	saldoOfertado     float64 `json:"saldoOfertado"`
-	idComprador       string  `json:"idComprador"`
-	valorLance        float64 `json:"valorLance"`
-	statusOrdem       string  `json:"statusOrdem"` // Recente - Andamento - Fechado
+	proprietarioOrdem string `json:"proprietarioOrdem"` // FK (Veiculo)
+	tipoTransacao     string `json:"tipoTransacao"`     // 1: Vender carbono -- 2: Comprar carbono
+	saldoOfertado     string `json:"saldoOfertado"`
+	idComprador       string `json:"idComprador"`
+	valorLance        string `json:"valorLance"`
+	statusOrdem       string `json:"statusOrdem"` // Recente - Andamento - Fechado
 }
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
@@ -129,19 +129,14 @@ func (s *SmartContract) registrarModelo(stub shim.ChaincodeStubInterface, args [
 	modelo := args[4]
 	emissao_co2 := args[5]
 
-	emissFloat, err := strconv.ParseFloat(emissao_co2, 64)
-	emissArredondado := Arredondar(emissFloat)
-
-	if err != nil {
-		return shim.Error("Houve um problema ao converter o float")
-	}
+	emissFormatado := fmt.Sprintf("%.2f", emissao_co2)
 
 	var categoriaInfor = ModeloVeiculo{ //Inserindo argumentos dentro da Struct Categoria
 		Categoria:  categoria,
 		Marca:      marca,
 		Versao:     versao,
 		Modelo:     modelo,
-		EmissaoCo2: emissArredondado,
+		EmissaoCo2: emissFormatado,
 	}
 
 	categoriaAsBytes, _ := json.Marshal(categoriaInfor) //Encapsulando as informações em arquivo JSON
@@ -164,9 +159,9 @@ func (s *SmartContract) registrarFabricante(stub shim.ChaincodeStubInterface, ar
 	}
 
 	var fabricanteInfor = Fabricante{
-		Co2Tot:          0.0,
-		SaldoCarbono:    0.0,
-		SaldoFiduciario: 10000.0,
+		Co2Tot:          "0.0",
+		SaldoCarbono:    "0.0",
+		SaldoFiduciario: "10000.0",
 	}
 
 	fabricanteAsBytes, _ := json.Marshal(fabricanteInfor) //Encapsulando as informações em arquivo JSON
@@ -193,7 +188,7 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 	//Criar Struct para manipular as informações do veículo
 	userVeiculo := Veiculo{
 		IdCdgModelo:         CdgModeloUser,
-		AcumuladorDistancia: 0.0,
+		AcumuladorDistancia: "0.0",
 	}
 
 	veiculoAsBytes, _ := json.Marshal(userVeiculo)
@@ -235,14 +230,16 @@ func (s *SmartContract) registrarTrajeto(stub shim.ChaincodeStubInterface, args 
 	trajetoVeiculo := TrajetoVeiculo{}
 	trajeto := Trajeto{}
 
-	distAcumulado := veiculo.AcumuladorDistancia //Inserindo o acumulador de distância do usuário dentro de uma variável
+	distAcumuladoString := veiculo.AcumuladorDistancia //Inserindo o acumulador de distância do usuário dentro de uma variável
+	distAcumuladoFloat, err := strconv.ParseFloat(distAcumuladoString, 64)
 
-	distAcumulado += userDistFLoat //Adicionar a distancia do trajeto feito ao acumulador
+	distAcumuladoFloat += userDistFLoat //Adicionar a distancia do trajeto feito ao acumulador
+	newDist := fmt.Sprintf("%g", distAcumuladoFloat)
 
-	veiculo.AcumuladorDistancia = distAcumulado
+	veiculo.AcumuladorDistancia = newDist
 
 	//Criar assinatura do trajeto
-	trajeto.TrajetoDistancia = userDistFLoat
+	trajeto.TrajetoDistancia = userDistancia
 
 	//Associar trajeto com o usuário
 	trajetoVeiculo.IdPlaca = idPlaca
@@ -308,10 +305,16 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 	fabricante := Fabricante{}
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
-	co2Veiculo := veiculo.AcumuladorDistancia * modelo.EmissaoCo2
+	disAcumuladorFloat, err := strconv.ParseFloat(veiculo.AcumuladorDistancia, 64)
+	modEmissCo2Float, err := strconv.ParseFloat(modelo.EmissaoCo2, 64)
+
+	co2Veiculo := disAcumuladorFloat * modEmissCo2Float
 	co2VeiculoArredondado := Arredondar(co2Veiculo)
-	fabricante.Co2Tot += co2VeiculoArredondado
-	veiculo.AcumuladorDistancia = 0.0
+
+	fabCo2Float, err := strconv.ParseFloat(fabricante.Co2Tot, 64)
+
+	fabCo2Float += co2VeiculoArredondado
+	veiculo.AcumuladorDistancia = "0.0"
 
 	//Encapsulando dados em arquivo JSON
 	veiculoAsBytesFinal, _ := json.Marshal(veiculo)
@@ -345,18 +348,17 @@ func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args 
 	fabricante := Fabricante{}
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
-	if fabricante.Co2Tot == 0 {
+	if fabricante.Co2Tot == "0" {
 		fmt.Println("Não foi computado emissão de carbono para o fabricante: " + idFabricante)
 		return shim.Success(nil)
 	}
 
-	var saldo = 50000.0 - fabricante.Co2Tot
-	fabricante.SaldoCarbono = saldo
-	fabricante.Co2Tot = 0
+	fabCo2Float, err := strconv.ParseFloat(fabricante.Co2Tot, 64)
 
-	fabricante.Co2Tot = fabricante.Co2Tot
-	fabricante.SaldoCarbono = fabricante.SaldoCarbono
-	fabricante.SaldoFiduciario = fabricante.SaldoFiduciario
+	var saldo = 50000.0 - fabCo2Float
+	saldoString := fmt.Sprintf("%g", saldo)
+	fabricante.SaldoCarbono = saldoString
+	fabricante.Co2Tot = "0"
 
 	fabricanteAsBytesFinal, _ := json.Marshal(fabricante)
 
@@ -381,7 +383,7 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 	fmt.Println("--------")
 	fmt.Println(nomeFabricante + "/---/" + saldoOferta + "/---/" + tipoTransacao + "/---/")
 
-	saldoOfertaFLoat, err := strconv.ParseFloat(saldoOferta, 64)
+	saldoOfertaFloat, err := strconv.ParseFloat(saldoOferta, 64)
 
 	//Verificando se o fabricante realmente existe
 	idFabricanteCompleto := "fab-" + nomeFabricante
@@ -394,26 +396,37 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 	fabricante := Fabricante{}
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
+	saldoCarbonoFloat, err := strconv.ParseFloat(fabricante.SaldoCarbono, 64)
+	saldoFiduciarioFloat, err := strconv.ParseFloat(fabricante.SaldoFiduciario, 64)
+
 	if tipoTransacao == "vender" {
-		if saldoOfertaFLoat > fabricante.SaldoCarbono {
+		if saldoOfertaFloat > saldoCarbonoFloat {
 			return shim.Error("Você não tem saldo de carbono suficiente")
 		}
-		fabricante.SaldoCarbono -= saldoOfertaFLoat
+
+		saldoCarbonoFloat -= saldoOfertaFloat
+		saldoCarbonoString := fmt.Sprintf("%g", saldoCarbonoFloat)
+		fabricante.SaldoCarbono = saldoCarbonoString
+
 	}
 
 	if tipoTransacao == "comprar" {
-		if saldoOfertaFLoat > fabricante.SaldoFiduciario {
+		if saldoOfertaFloat > saldoFiduciarioFloat {
 			return shim.Error("Você não tem saldo fiduciario suficiente")
 		}
-		fabricante.SaldoFiduciario -= saldoOfertaFLoat
+		saldoFiduciarioFloat -= saldoOfertaFloat
+		saldoFiduciarioString := fmt.Sprintf("%g", saldoFiduciarioFloat)
+		fabricante.SaldoFiduciario = saldoFiduciarioString
 	}
 
-	var ordemVenda = OrdemTransacao{
-		proprietarioOrdem: idFabricanteCompleto,
-		tipoTransacao:     tipoTransacao,
-		saldoOfertado:     saldoOfertaFLoat,
-		statusOrdem:       "Recente",
-	}
+	saldoOfertaString := fmt.Sprintf("%g", saldoOfertaFloat)
+
+	var ordemVenda = OrdemTransacao{}
+
+	ordemVenda.proprietarioOrdem = idFabricanteCompleto
+	ordemVenda.tipoTransacao = tipoTransacao
+	ordemVenda.saldoOfertado = saldoOfertaString
+	ordemVenda.statusOrdem = "Recente"
 
 	ordemAsBytes, _ := json.Marshal(ordemVenda)
 	fabricanteAsBytesFInal, _ := json.Marshal(fabricante)
