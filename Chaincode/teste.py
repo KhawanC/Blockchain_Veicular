@@ -18,12 +18,5 @@
 
 # with open('dadosVeicularesAtualizados.json', 'w', encoding='utf8') as arq:
 #     json.dump(arq_json, arq, indent=2, separators=(',', ': '), ensure_ascii=False)
-
-montadoras = ["Volks", "Fiat"]
-novoCarro = "Volkies"
-
-montadoras.append("isso")
-montadoras.append("eh")
-montadoras.append("um")
-montadoras.append("teste")
-print(montadoras)
+p = 123.123
+print(round(p, 2))

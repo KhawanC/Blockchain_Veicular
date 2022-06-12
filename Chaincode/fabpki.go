@@ -129,14 +129,12 @@ func (s *SmartContract) registrarModelo(stub shim.ChaincodeStubInterface, args [
 	modelo := args[4]
 	emissao_co2 := args[5]
 
-	emissFormatado := fmt.Sprintf("%.2f", emissao_co2)
-
 	var categoriaInfor = ModeloVeiculo{ //Inserindo argumentos dentro da Struct Categoria
 		Categoria:  categoria,
 		Marca:      marca,
 		Versao:     versao,
 		Modelo:     modelo,
-		EmissaoCo2: emissFormatado,
+		EmissaoCo2: emissao_co2,
 	}
 
 	categoriaAsBytes, _ := json.Marshal(categoriaInfor) //Encapsulando as informações em arquivo JSON

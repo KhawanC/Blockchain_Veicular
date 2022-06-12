@@ -78,7 +78,7 @@ if __name__ == "__main__":
             cc_name=cc_name,
             cc_version=cc_version,
             fcn='registrarModelo',
-            args=[cdg.replace(" ", "-"),str(a),str(b),str(c),str(d),str(p)],
+            args=[cdg.replace(" ", "-"),str(a),str(b),str(c),str(d),str(round(p, 3))],
             cc_pattern=None))
 
     for i in listaMontadoras:
