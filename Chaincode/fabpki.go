@@ -270,14 +270,14 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 	idPlaca := args[0]
 
 	//Recuperando dados do usuário
-	userAsBytes, err := stub.GetState(idPlaca)
-	if err != nil || userAsBytes == nil {
+	veiculoAsBytes, err := stub.GetState(idPlaca)
+	if err != nil || veiculoAsBytes == nil {
 		return shim.Error("Sua placa não existe.")
 	}
 
 	//Criando Struct para encapsular os dados do veiculo
 	veiculo := Veiculo{}
-	json.Unmarshal(userAsBytes, &veiculo)
+	json.Unmarshal(veiculoAsBytes, &veiculo)
 
 	idModelo := veiculo.IdCdgModelo
 
@@ -312,16 +312,28 @@ func (s *SmartContract) registrarCarbono(stub shim.ChaincodeStubInterface, args 
 	fabCo2Float, err := strconv.ParseFloat(fabricante.Co2Tot, 64)
 
 	fabCo2Float += co2VeiculoArredondado
+	fabCO2String := fmt.Sprintf("%g", fabCo2Float)
+	fabricante.Co2Tot = fabCO2String
 	veiculo.AcumuladorDistancia = "0.0"
 
-	//Encapsulando dados em arquivo JSON
-	veiculoAsBytesFinal, _ := json.Marshal(veiculo)
-	modeloAsBytesFinal, _ := json.Marshal(modelo)
-	fabricanteAsBytesFinal, _ := json.Marshal(fabricante)
+	fmt.Println("-----registro de carbono---")
+	fmt.Println(veiculo)
+	fmt.Println(modelo)
+	fmt.Println(fabricante)
 
-	stub.PutState(idPlaca, veiculoAsBytesFinal)
-	stub.PutState(idModelo, modeloAsBytesFinal)
-	stub.PutState(idFabricante, fabricanteAsBytesFinal)
+	//Encapsulando dados em arquivo JSON
+	veiculoAsBytes, _ = json.Marshal(veiculo)
+	modeloAsBytes, _ = json.Marshal(modelo)
+	fabricanteAsBytes, _ = json.Marshal(fabricante)
+
+	fmt.Println("-----BYTES-----")
+	fmt.Println(veiculoAsBytes)
+	fmt.Println(modeloAsBytes)
+	fmt.Println(fabricanteAsBytes)
+
+	stub.PutState(idPlaca, veiculoAsBytes)
+	stub.PutState(idModelo, modeloAsBytes)
+	stub.PutState(idFabricante, fabricanteAsBytes)
 
 	fmt.Println("Sucesso ao computador co2 dos fabricantes")
 	return shim.Success(nil)
@@ -346,7 +358,7 @@ func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args 
 	fabricante := Fabricante{}
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
-	if fabricante.Co2Tot == "0" {
+	if fabricante.Co2Tot == "0.0" {
 		fmt.Println("Não foi computado emissão de carbono para o fabricante: " + idFabricante)
 		return shim.Success(nil)
 	}
@@ -373,13 +385,9 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 		return shim.Error("Era esperado 3 único argumento... Tente novamente!")
 	}
 
-	fmt.Println("")
-
 	nomeFabricante := args[0]
 	tipoTransacao := args[1]
 	saldoOferta := args[2]
-	fmt.Println("--------dados transação inicio-----------")
-	fmt.Println(nomeFabricante + "/---/" + saldoOferta + "/---/" + tipoTransacao)
 
 	saldoOfertaFloat, err := strconv.ParseFloat(saldoOferta, 64)
 
@@ -398,9 +406,9 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 	saldoFiduciarioFloat, err := strconv.ParseFloat(fabricante.SaldoFiduciario, 64)
 
 	if tipoTransacao == "vender" {
-		// if saldoOfertaFloat > saldoCarbonoFloat {
-		// 	return shim.Error("Você não tem saldo de carbono suficiente")
-		// }
+		if saldoOfertaFloat > saldoCarbonoFloat {
+			return shim.Error("Você não tem saldo de carbono suficiente")
+		}
 
 		saldoCarbonoFloat -= saldoOfertaFloat
 		saldoCarbonoString := fmt.Sprintf("%g", saldoCarbonoFloat)
@@ -409,9 +417,9 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 	}
 
 	if tipoTransacao == "comprar" {
-		// if saldoOfertaFloat > saldoFiduciarioFloat {
-		// 	return shim.Error("Você não tem saldo fiduciario suficiente")
-		// }
+		if saldoOfertaFloat > saldoFiduciarioFloat {
+			return shim.Error("Você não tem saldo fiduciario suficiente")
+		}
 		saldoFiduciarioFloat -= saldoOfertaFloat
 		saldoFiduciarioString := fmt.Sprintf("%g", saldoFiduciarioFloat)
 		fabricante.SaldoFiduciario = saldoFiduciarioString
