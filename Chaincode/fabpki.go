@@ -108,6 +108,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 		return s.registrarCredito(stub, args)
 	} else if fn == "anunciarOrdem" {
 		return s.anunciarOrdem(stub, args)
+	} else if fn == "ordemLance" {
+		return s.ordemLance(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
@@ -452,6 +454,33 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 	stub.PutState(idOrdem, ordemVendaAsBytes)
 
 	fmt.Println("Ordem de " + tipoTransacao + " anunciado com sucesso!")
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	idTransacao := args[0]
+	valorLance := args[1]
+	idComprador := args[2]
+
+	//Recuperando dados do proprietário
+	ordemTransacaoAsBytes, err := stub.GetState(idTransacao)
+	if err != nil || ordemTransacaoAsBytes == nil {
+		return shim.Error("Seu proprietário não existe.")
+	}
+
+	propietario := OrdemTransacao{}
+	json.Unmarshal(ordemTransacaoAsBytes, &propietario)
+
+	propietario.StatusOrdem = "Andamento"
+	propietario.ValorLance = valorLance
+	propietario.IdComprador = idComprador
+
+	ordemTransacaoAsBytesFinal, _ := json.Marshal(propietario)
+	stub.PutState(idTransacao, ordemTransacaoAsBytesFinal)
+
+	fmt.Println("Lance feito no sucesso")
+
 	return shim.Success(nil)
 }
 
