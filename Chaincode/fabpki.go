@@ -147,6 +147,8 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 		Co2:  co2,
 	}
 
+	//LEMBRAR DE ACHAR UM MÉTODO PARA RESGATAR O FABRICANTE PELO VIM PARA ACUMULAR O CO2 NOS RESPECTIVOS FABRICANTES
+
 	veiculoAsBytes, _ := json.Marshal(userVeiculo)
 
 	idUserVeiculo := "veic-" + vim
@@ -158,7 +160,6 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 
 func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	//Verificar se arquivo py retornou 1 argumento
 	if len(args) != 1 {
 		return shim.Error("Era esperado 1 único argumento... Tente novamente!")
 	}

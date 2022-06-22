@@ -2,12 +2,13 @@ from crypt import methods
 from hfc.fabric import Client as client_fabric
 from flask import *
 from tornado.platform.asyncio import AnyThreadEventLoopPolicy
-import asyncio
+import asyncio, couchdb, json
 
 domain = "ptb.de"
 channel_name = "nmi-channel"
 cc_name = "fabpki"
 cc_version = "1.0"
+import couchdb, json
 
 app = Flask(__name__)
 
@@ -37,13 +38,9 @@ def insertVeiculo():
                                cc_version=cc_version,
                                fcn='registrarVeiculo',
                                cc_pattern=None))
-    
-    print(response)
-    
-    return {
-        "status": 200,
-        "mensagem": "Veiculo registrado com sucesso!"
-    }
+    return Response(response=json.dumps({
+        "status": 201,
+        "mensagem": "Veiculo registrado com sucesso"}), status=201, mimetype='application/json')
 
 @app.route('/inserir_fabricante', methods=['POST'])
 def insertFabricante():
@@ -59,25 +56,44 @@ def insertFabricante():
     callpeer = "peer0." + domain
     
     c_hlf.new_channel(channel_name)
+    
+    fab_nome = request_data["nome"]
 
     response = loop.run_until_complete(
         c_hlf.chaincode_invoke(requestor=admin,
                                channel_name=channel_name,
                                peers=[callpeer],                               
-                               args=[request_data["nome"]],
+                               args=[fab_nome.upper()],
                                cc_name=cc_name,
                                cc_version=cc_version,
                                fcn='registrarFabricante',
                                cc_pattern=None))
     
-    print(response)
+    return Response(response=json.dumps({
+        "status": 201,
+        "mensagem": "Fabricante registrado com sucesso"}), status=201, mimetype='application/json')
     
-    return {
-        "status": 200,
-        "mensagem": "Fabricante registrado com sucesso!"
-    }
+@app.route('/listar_veiculos', methods=['GET'])
+def getVeiculo():
+    listaVeiculos = []
+    server = couchdb.Server('http://localhost:5984/_utils')
+    couch = couchdb.Server()
+    db = couch['nmi-channel_fabpki']
+      
+    for doc in db.view('_all_docs'):
+            i = doc['id']
+            if i[0:5] == "veic-":
+                  for doc in db.find({
+                        "selector": {
+                        "_id": "{id}".format(id=i)
+                        }}):
+                        query_info = json.dumps(doc, indent=4, sort_keys=True)
+                        query_json = json.loads(query_info)
+                        infoVeiculo = query_json
+                        listaVeiculos.append(infoVeiculo)
+                  
+    return json.dumps(listaVeiculos), 200
     
-
 if __name__ == "__main__":
     app.run(debug=True, port=8001, host="0.0.0.0")
 

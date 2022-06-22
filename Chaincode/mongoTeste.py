@@ -15,5 +15,12 @@ if __name__ == "__main__":
       for doc in db.view('_all_docs'):
             i = doc['id']
             if i[0:5] == "veic-":
-                  items.append(i)
-      print(items[0][0:5])
+                  for doc in db.find({
+                        "selector": {
+                        "_id": "{id}".format(id=i)
+                        }}):
+                        query_info = json.dumps(doc, indent=4, sort_keys=True)
+                        query_json = json.loads(query_info)
+                        infoVeiculo = query_json
+                        items.append(infoVeiculo)
+      print(items)
