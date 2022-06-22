@@ -63,6 +63,12 @@ type Veiculo struct { //"user-"
 	AcumuladorDistancia string `json:"AcumuladorDistancia"`
 }
 
+type Veiculo2 struct { //"user-"
+	Hash string `json:"Hash"`
+	Vim  string `json:"Vim"`
+	Co2  string `json:"Co2"`
+}
+
 type Trajeto struct { //"traj-"
 	TrajetoDistancia string `json:"TrajetoDistancia"`
 }
@@ -110,6 +116,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 		return s.anunciarOrdem(stub, args)
 	} else if fn == "ordemLance" {
 		return s.ordemLance(stub, args)
+	} else if fn == "fecharOrdem" {
+		return s.fecharOrdem(stub, args)
 	}
 
 	return shim.Error("Chaincode não suporta essa função.")
@@ -178,23 +186,24 @@ func (s *SmartContract) registrarFabricante(stub shim.ChaincodeStubInterface, ar
 func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	//Verificar se existem mais de 2 argumentos no código do cliente
-	if len(args) != 2 {
-		return shim.Error("Eram esperados 2 argumentos... Tente novamente!")
+	if len(args) != 3 {
+		return shim.Error("Eram esperados 3 argumentos... Tente novamente!")
 	}
 
-	userPlaca := args[0]
-	CdgModeloUser := args[1]
+	vim := args[0]
+	hash := args[1]
+	co2 := args[2]
 
 	//Criar Struct para manipular as informações do veículo
-	userVeiculo := Veiculo{
-		IdCdgModelo:         CdgModeloUser,
-		AcumuladorDistancia: "0.0",
+	userVeiculo := Veiculo2{
+		Hash: hash,
+		Vim:  vim,
+		Co2:  co2,
 	}
 
 	veiculoAsBytes, _ := json.Marshal(userVeiculo)
 
-	//Inserir valores no ledger. ID = placa do veículo
-	idUserVeiculo := "veic-" + userPlaca
+	idUserVeiculo := "veic-" + vim
 	stub.PutState(idUserVeiculo, veiculoAsBytes)
 
 	fmt.Println("Sucesso ao registrar veiculo")
@@ -463,14 +472,39 @@ func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []stri
 	valorLance := args[1]
 	idComprador := args[2]
 
-	//Recuperando dados do proprietário
+	valorLanceFloat, err := strconv.ParseFloat(valorLance, 64)
+
+	//Recuperando dados da transação
 	ordemTransacaoAsBytes, err := stub.GetState(idTransacao)
+	if err != nil || ordemTransacaoAsBytes == nil {
+		return shim.Error("Seu proprietário não existe.")
+	}
+
+	//Recuperando dados do proprietário
+	fabricanteAsBytes, err := stub.GetState(idComprador)
 	if err != nil || ordemTransacaoAsBytes == nil {
 		return shim.Error("Seu proprietário não existe.")
 	}
 
 	propietario := OrdemTransacao{}
 	json.Unmarshal(ordemTransacaoAsBytes, &propietario)
+
+	fabricante := Fabricante{}
+	json.Unmarshal(fabricanteAsBytes, &fabricante)
+
+	saldoFiat := fabricante.SaldoFiduciario
+	saldoFiatFloat, err := strconv.ParseFloat(saldoFiat, 64)
+
+	saldoCarb := fabricante.SaldoCarbono
+	saldoCarbFloat, err := strconv.ParseFloat(saldoCarb, 64)
+
+	if valorLanceFloat > saldoFiatFloat && propietario.TipoTransacao == "vender" {
+		return shim.Error("Você não tem saldo fiduciario suficiente")
+	}
+
+	if valorLanceFloat > saldoCarbFloat && propietario.TipoTransacao == "comprar" {
+		return shim.Error("Você não tem saldo de carbono suficiente")
+	}
 
 	propietario.StatusOrdem = "Andamento"
 	propietario.ValorLance = valorLance
@@ -482,6 +516,20 @@ func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []stri
 	fmt.Println("Lance feito no sucesso")
 
 	return shim.Success(nil)
+}
+
+func (s *SmartContract) fecharOrdem(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	idTransacao := args[0]
+
+	//Recuperando dados da transação
+	ordemTransacaoAsBytes, err := stub.GetState(idTransacao)
+	if err != nil || ordemTransacaoAsBytes == nil {
+		return shim.Error("Seu proprietário não existe.")
+	}
+
+	return shim.Success(nil)
+
 }
 
 func main() {
