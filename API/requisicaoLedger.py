@@ -14,7 +14,7 @@ app = Flask(__name__)
 asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())
 
 @app.route('/inserir_veiculo', methods=['POST'])
-def insertVeiculo(hash, vin, carbono):
+def insertVeiculo():
     
     request_data = request.get_json()
     
