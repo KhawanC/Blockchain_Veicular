@@ -12,11 +12,11 @@ listaFabricantes = []
 
 if __name__ == "__main__":
     
-    # loop = asyncio.get_event_loop()
-    # c_hlf = client_fabric(net_profile=(domain + ".json"))
-    # admin = c_hlf.get_user(domain, 'Admin')
-    # callpeer = "peer0." + domain
-    # c_hlf.new_channel(channel_name)
+    loop = asyncio.get_event_loop()
+    c_hlf = client_fabric(net_profile=(domain + ".json"))
+    admin = c_hlf.get_user(domain, 'Admin')
+    callpeer = "peer0." + domain
+    c_hlf.new_channel(channel_name)
     
     for doc in db.view('_all_docs'):
         i = doc['id']
@@ -28,7 +28,8 @@ if __name__ == "__main__":
         if i[0:6] == "trans-":
             listaTransacoes.append(i)
     
-    print(listaTransacoes)
+    for i in range(0, len(listaTransacoes)):
+        print(str(i) + ' - ' + listaTransacoes[i])
     
     idTransacao = int(input('Esses são as transações, qual você deseja? '))       
     
@@ -42,12 +43,32 @@ if __name__ == "__main__":
         query_json = json.loads(query_info)
         transacaoInfor = query_json
     
-    print(transacaoInfor)
+    print('\nInformações: ')
+    print('Id Comprador: ' + transacaoInfor['IdComprador'])
+    print('Propietário da Ordem: ' + transacaoInfor['ProprietarioOrdem'])
+    print('Status da Ordem: ' + transacaoInfor['StatusOrdem'])
+    print('Tipo da Transação: ' + transacaoInfor['TipoTransacao'])
+    print('Saldo Ofertado: ' + transacaoInfor['SaldoOfertado'])
     print('Ultimo lance: ' + transacaoInfor['ValorLance'])
-    lance = input('Qual será o seu lance ? ')
     
-    print(listaFabricantes)
-    idComprador = input('Quem é você? ')
+    lance = input('\nQual será o seu lance ? ')
     
-    print('Dados: \n' + idComprador + '\n' + listaTransacoes[idTransacao] + '\n' + lance)
+    for i in range(0, len(listaFabricantes)):
+        print(str(i) + ' - ' + listaFabricantes[i])
+        
+    idComprador = int(input('\nQuem é você? '))
+    
+    print('Dados finais: ')
+    print('\n' + listaFabricantes[idComprador] + '\n' + listaTransacoes[idTransacao] + '\n' + lance)
+    
+    
+    response = loop.run_until_complete(c_hlf.chaincode_invoke(
+                requestor=admin,
+                channel_name=channel_name,
+                peers=[callpeer],
+                cc_name=cc_name,
+                cc_version=cc_version,
+                fcn='ordemLance',
+                args=[listaTransacoes[idTransacao], lance, listaFabricantes[idComprador]],
+                cc_pattern=None))
         
