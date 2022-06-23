@@ -52,7 +52,7 @@ type SmartContract struct {
 
 type Veiculo struct { //"user-"
 	Hash       string  `json:"Hash"`
-	Vim        string  `json:"Vim"`
+	VIN        string  `json:"VIN"`
 	Co2Emitido float64 `json:"Co2Emitido"`
 	Fabricante string  `json:"Fabricante"`
 }
@@ -60,7 +60,7 @@ type Veiculo struct { //"user-"
 type Fabricante struct { //"fab-""
 	Co2Tot          float64 `json:"Co2_Tot"`
 	SaldoCarbono    float64 `json:"SaldoCarbono"`
-	SaldoFiduciario float64 `json:"Saldo_FIduciario"`
+	SaldoFiduciario float64 `json:"Saldo_Fiduciario"`
 }
 
 type OrdemTransacao struct { //"trans-"
@@ -98,12 +98,11 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 
 func (s *SmartContract) registrarFabricante(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	nomeFab := args[0]
-
-	//Verificando se a quantidade de argumnetos é maior que 1
 	if len(args) != 1 {
-		return shim.Error("Não foi encontrado nenhum argumento. Tente novamente!")
+		return shim.Error("Era esperado 1 único argumento... Tente novamente!")
 	}
+
+	nomeFab := args[0]
 
 	fabricanteInfor := Fabricante{
 		Co2Tot:          0.0,
@@ -137,7 +136,7 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 	//Criar Struct para manipular as informações do veículo
 	userVeiculo := Veiculo{
 		Hash:       hash,
-		Vim:        vim,
+		VIN:        vim,
 		Co2Emitido: co2VeicFloat,
 		Fabricante: fabNome,
 	}
@@ -202,19 +201,20 @@ func (s *SmartContract) registrarCredito(stub shim.ChaincodeStubInterface, args 
 func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 3 {
+		fmt.Println("Eram esperados 3 arugmentos")
 		return shim.Error("Era esperado 3 argumentos... Tente novamente!")
 	}
 
-	nomeFabricante := args[0]
+	proprietarioOrdem := args[0]
 	tipoTransacao := args[1]
 	saldoOferta := args[2]
 
 	saldoOfertaFloat, err := strconv.ParseFloat(saldoOferta, 64)
 
 	//Verificando se o fabricante realmente existe
-	idFabricanteCompleto := "fab-" + nomeFabricante
-	fabricanteAsBytes, err := stub.GetState(idFabricanteCompleto)
+	fabricanteAsBytes, err := stub.GetState(proprietarioOrdem)
 	if err != nil || fabricanteAsBytes == nil {
+		fmt.Println("Seu fabricante não existe")
 		return shim.Error("Seu fabricante não existe.")
 	}
 
@@ -224,6 +224,7 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 
 	if tipoTransacao == "vender" {
 		if saldoOfertaFloat > fabricante.SaldoCarbono {
+			fmt.Println("Você não tem saldo de carbono suficiente")
 			return shim.Error("Você não tem saldo de carbono suficiente")
 		}
 		fabricante.SaldoCarbono -= saldoOfertaFloat
@@ -231,6 +232,7 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 
 	if tipoTransacao == "comprar" {
 		if saldoOfertaFloat > fabricante.SaldoFiduciario {
+			fmt.Println("VocÊ não tem saldo fiduciario suficiente")
 			return shim.Error("Você não tem saldo fiduciario suficiente")
 		}
 		fabricante.SaldoFiduciario -= saldoOfertaFloat
@@ -240,7 +242,7 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 		IdComprador:       "null",
 		ValorUltimoLance:  0.0,
 		StatusOrdem:       "recente",
-		ProprietarioOrdem: idFabricanteCompleto,
+		ProprietarioOrdem: proprietarioOrdem,
 		SaldoOfertado:     saldoOfertaFloat,
 		TipoTransacao:     tipoTransacao,
 	}
@@ -248,9 +250,9 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 	ordemVendaAsBytes, _ := json.Marshal(ordemVenda)
 	fabricanteAsBytes, _ = json.Marshal(fabricante)
 
-	idOrdem := "trans-" + nomeFabricante + Encode(AleatString(10))
+	idOrdem := "trans-" + Encode(AleatString(10))
 
-	stub.PutState(idFabricanteCompleto, fabricanteAsBytes)
+	stub.PutState(proprietarioOrdem, fabricanteAsBytes)
 	stub.PutState(idOrdem, ordemVendaAsBytes)
 
 	fmt.Println("Ordem de " + tipoTransacao + " anunciado com sucesso!")
@@ -259,7 +261,8 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 
 func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 2 {
+	if len(args) != 3 {
+		fmt.Println("Eram esperados 2 argumentos")
 		return shim.Error("Era esperado 2 argumentos... Tente novamente!")
 	}
 
@@ -272,13 +275,15 @@ func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []stri
 	//Recuperando dados da transação
 	ordemTransacaoAsBytes, err := stub.GetState(idTransacao)
 	if err != nil || ordemTransacaoAsBytes == nil {
+		fmt.Println("Seu proprietario nao existe")
 		return shim.Error("Seu proprietário não existe.")
 	}
 
 	//Recuperando dados do proprietário
 	fabricanteAsBytes, err := stub.GetState(idComprador)
 	if err != nil || ordemTransacaoAsBytes == nil {
-		return shim.Error("Seu proprietário não existe.")
+		fmt.Println("Seu fabricante nao existe")
+		return shim.Error("Seu fabricante não existe.")
 	}
 
 	//Encapsulando os dados da ordem de transação e do fabricante
@@ -286,6 +291,7 @@ func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []stri
 	json.Unmarshal(ordemTransacaoAsBytes, &ordem)
 
 	if ordem.StatusOrdem == "fechado" {
+		fmt.Println("Essa ordem está fechada")
 		return shim.Error("Essa ordem não pode mais ser movimentado pois o proprietário à fechou.")
 	}
 
@@ -293,14 +299,17 @@ func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []stri
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
 	if valorLanceFloat > fabricante.SaldoFiduciario && ordem.TipoTransacao == "vender" {
+		fmt.Println("Voce nao tem saldo fiduciario suficiente")
 		return shim.Error("Você não tem saldo fiduciario suficiente.")
 	}
 
 	if valorLanceFloat > fabricante.SaldoCarbono && ordem.TipoTransacao == "comprar" {
+		fmt.Println("Você nao tem saldo de carbono suficiente")
 		return shim.Error("Você não tem saldo de carbono suficiente.")
 	}
 
 	if ordem.ValorUltimoLance > valorLanceFloat {
+		fmt.Println("Seu lance é menor do que o lance anterior")
 		return shim.Error("Seu lance é menor do que o lance anterior.")
 	}
 
@@ -318,12 +327,18 @@ func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []stri
 
 func (s *SmartContract) fecharOrdem(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
+	if len(args) != 2 {
+		fmt.Println("Eram esperados 2 argumentos")
+		return shim.Error("Era esperado 2 argumentos... Tente novamente!")
+	}
+
 	idTransacao := args[0]
 	idProprietario := args[1]
 
 	//Recuperando dados da transação
 	ordemTransacaoAsBytes, err := stub.GetState(idTransacao)
 	if err != nil || ordemTransacaoAsBytes == nil {
+		fmt.Println("Essa ordem nao existe")
 		return shim.Error("Essa ordem não existe.")
 	}
 
@@ -332,18 +347,21 @@ func (s *SmartContract) fecharOrdem(stub shim.ChaincodeStubInterface, args []str
 	json.Unmarshal(ordemTransacaoAsBytes, &ordem)
 
 	if ordem.ProprietarioOrdem != idProprietario {
+		fmt.Println("Você nao é proprietario dessa ordem")
 		return shim.Error("Você não é o proprietário dessa ordem")
 	}
 
 	//Recuperando
 	proprietarioAsBytes, err := stub.GetState(ordem.ProprietarioOrdem)
 	if err != nil || ordemTransacaoAsBytes == nil {
+		fmt.Println("Seu proprietario nao existe")
 		return shim.Error("Seu proprietário não existe.")
 	}
 
 	//Recuperando
 	compradorAsBytes, err := stub.GetState(ordem.IdComprador)
 	if err != nil || ordemTransacaoAsBytes == nil {
+		fmt.Println("Seu comprador nao existe")
 		return shim.Error("Seu comprador não existe.")
 	}
 
@@ -356,6 +374,7 @@ func (s *SmartContract) fecharOrdem(stub shim.ChaincodeStubInterface, args []str
 	json.Unmarshal(compradorAsBytes, &comprador)
 
 	if ordem.IdComprador == "null" {
+		fmt.Println("Nao houveram lances para essa ordem")
 		fmt.Println("Não houveram lances para essa ordem...")
 	} else if ordem.TipoTransacao == "vender" {
 		proprietario.SaldoFiduciario += ordem.ValorUltimoLance

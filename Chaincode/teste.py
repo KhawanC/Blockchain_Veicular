@@ -18,5 +18,9 @@
 
 # with open('dadosVeicularesAtualizados.json', 'w', encoding='utf8') as arq:
 #     json.dump(arq_json, arq, indent=2, separators=(',', ': '), ensure_ascii=False)
-p = 123.123
-print(round(p, 2))
+
+
+from vininfo import Vin
+
+vin = Vin('1G1JD6SH9J4126861')
+print(vin.manufacturer)

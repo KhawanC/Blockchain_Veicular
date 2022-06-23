@@ -2,6 +2,7 @@ from crypt import methods
 from hfc.fabric import Client as client_fabric
 from flask import *
 from tornado.platform.asyncio import AnyThreadEventLoopPolicy
+from vininfo import Vin
 import asyncio, couchdb, json
 
 domain = "ptb.de"
@@ -101,12 +102,14 @@ def Veiculo():
         callpeer = "peer0." + domain
         
         c_hlf.new_channel(channel_name)
+        
+        vin = Vin(request_data["Vim"])
 
         response = loop.run_until_complete(
             c_hlf.chaincode_invoke(requestor=admin,
                                 channel_name=channel_name,
                                 peers=[callpeer],                               
-                                args=[request_data["Vim"], request_data["Hash"], request_data["Co2"], request_data["Fabricante"]],
+                                args=[request_data["Vim"], request_data["Hash"], request_data["Co2"], (vin.manufacturer).upper()],
                                 cc_name=cc_name,
                                 cc_version=cc_version,
                                 fcn='registrarVeiculo',
@@ -150,8 +153,8 @@ def Saldo():
             "mensagem": "Saldo dos fabricantes atualizados com suceso"}), status=201, mimetype='application/json')
             
 
-@app.route('/transacao', methods=['GET', 'POST'])
-def Transacao():
+@app.route('/ordem', methods=['GET', 'POST'])
+def Ordem():
     if request.method == 'GET':
         listaTransacoes = []
         server = couchdb.Server('http://localhost:5984/_utils')
@@ -172,7 +175,7 @@ def Transacao():
                     
         return json.dumps(listaTransacoes), 200
 
-    if request.method == 'POST':
+    if request.method == 'POST' :
         
         request_data = request.get_json()
         
@@ -193,14 +196,73 @@ def Transacao():
                                 args=[request_data["ProprietarioOrdem"], request_data["TipoTransacao"], request_data["SaldoOfertado"]],
                                 cc_name=cc_name,
                                 cc_version=cc_version,
-                                fcn='registrarVeiculo',
+                                fcn='anunciarOrdem',
                                 cc_pattern=None))
         
         return Response(response=json.dumps({
             "status": 201,
             "mensagem": "Ordem de transação registrada com sucesso"}), status=201, mimetype='application/json')    
 
+@app.route('/lance', methods=['POST'])
+def Lance():
+    if request.method == 'POST' :
+        
+        request_data = request.get_json()
+        
+        loop = asyncio.get_event_loop()
 
+        c_hlf = client_fabric(net_profile=(domain + ".json"))
+
+        admin = c_hlf.get_user(domain, 'Admin')
+        
+        callpeer = "peer0." + domain
+        
+        c_hlf.new_channel(channel_name)
+
+        response = loop.run_until_complete(
+            c_hlf.chaincode_invoke(requestor=admin,
+                                channel_name=channel_name,
+                                peers=[callpeer],                               
+                                args=[request_data["IdTransacao"], request_data["ValorLance"], request_data["IdComprador"]],
+                                cc_name=cc_name,
+                                cc_version=cc_version,
+                                fcn='ordemLance',
+                                cc_pattern=None))
+        
+        return Response(response=json.dumps({
+            "status": 201,
+            "mensagem": "Lance registradao com sucesso"}), status=201, mimetype='application/json')    
+
+@app.route('/fechar_ordem', methods=['POST'])
+def FecharOrdem():
+    if request.method == 'POST' :
+        
+        request_data = request.get_json()
+        
+        loop = asyncio.get_event_loop()
+
+        c_hlf = client_fabric(net_profile=(domain + ".json"))
+
+        admin = c_hlf.get_user(domain, 'Admin')
+        
+        callpeer = "peer0." + domain
+        
+        c_hlf.new_channel(channel_name)
+
+        response = loop.run_until_complete(
+            c_hlf.chaincode_invoke(requestor=admin,
+                                channel_name=channel_name,
+                                peers=[callpeer],                               
+                                args=[request_data["IdTransacao"], request_data["IdProprietario"]],
+                                cc_name=cc_name,
+                                cc_version=cc_version,
+                                fcn='fecharOrdem',
+                                cc_pattern=None))
+        
+        return Response(response=json.dumps({
+            "status": 201,
+            "mensagem": "Lance registradao com sucesso"}), status=201, mimetype='application/json') 
+    
 if __name__ == "__main__":
     app.run(debug=True, port=8001, host="0.0.0.0")
 
