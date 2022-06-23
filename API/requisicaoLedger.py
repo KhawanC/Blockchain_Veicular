@@ -14,9 +14,30 @@ app = Flask(__name__)
 
 asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())    
 
-@app.route('/inserir_fabricante', methods=['POST', 'GET'])
+@app.route('/fabricante', methods=['POST', 'GET'])
 def Fabricante():
+    if request.method == 'GET':
+        listaFabricantes = []
+        server = couchdb.Server('http://localhost:5984/_utils')
+        couch = couchdb.Server()
+        db = couch['nmi-channel_fabpki']
+        
+        for doc in db.view('_all_docs'):
+                i = doc['id']
+                if i[0:4] == "fab-":
+                    for doc in db.find({
+                            "selector": {
+                            "_id": "{id}".format(id=i)
+                            }}):
+                            query_info = json.dumps(doc, indent=4, sort_keys=True)
+                            query_json = json.loads(query_info)
+                            infoVeiculo = query_json
+                            listaFabricantes.append(infoVeiculo)
+                    
+        return json.dumps(listaFabricantes), 200    
+    
     if request.method == 'POST':
+        
         request_data = request.get_json()
 
         loop = asyncio.get_event_loop()
@@ -68,6 +89,7 @@ def Veiculo():
         return json.dumps(listaVeiculos), 200
     
     if request.method == 'POST':
+        
         request_data = request.get_json()
         
         loop = asyncio.get_event_loop()
@@ -84,14 +106,100 @@ def Veiculo():
             c_hlf.chaincode_invoke(requestor=admin,
                                 channel_name=channel_name,
                                 peers=[callpeer],                               
-                                args=[request_data["Vim"], request_data["Hash"], request_data["Co2"]],
+                                args=[request_data["Vim"], request_data["Hash"], request_data["Co2"], request_data["Fabricante"]],
                                 cc_name=cc_name,
                                 cc_version=cc_version,
                                 fcn='registrarVeiculo',
                                 cc_pattern=None))
+        
         return Response(response=json.dumps({
             "status": 201,
             "mensagem": "Veiculo registrado com sucesso"}), status=201, mimetype='application/json')
+
+@app.route('/saldo', methods=['POST'])
+def Saldo():
+    if request.method == 'POST':
+        listaVeiculos = []
+        server = couchdb.Server('http://localhost:5984/_utils')
+        couch = couchdb.Server()
+        db = couch['nmi-channel_fabpki']
+        loop = asyncio.get_event_loop()
+        c_hlf = client_fabric(net_profile=(domain + ".json"))
+        admin = c_hlf.get_user(domain, 'Admin')
+        callpeer = "peer0." + domain
+        c_hlf.new_channel(channel_name)
+        
+        for doc in db.view('_all_docs'):
+                i = doc['id']
+                if i[0:4] == "fab-":
+                    listaVeiculos.append(i)
+        
+        for i in listaVeiculos:
+            response = loop.run_until_complete(
+                c_hlf.chaincode_invoke(requestor=admin,
+                                    channel_name=channel_name,
+                                    peers=[callpeer],                               
+                                    args=[i],
+                                    cc_name=cc_name,
+                                    cc_version=cc_version,
+                                    fcn='registrarCredito',
+                                    cc_pattern=None))
+            
+        return Response(response=json.dumps({
+            "status": 201,
+            "mensagem": "Saldo dos fabricantes atualizados com suceso"}), status=201, mimetype='application/json')
+            
+
+@app.route('/transacao', methods=['GET', 'POST'])
+def Transacao():
+    if request.method == 'GET':
+        listaTransacoes = []
+        server = couchdb.Server('http://localhost:5984/_utils')
+        couch = couchdb.Server()
+        db = couch['nmi-channel_fabpki']
+        
+        for doc in db.view('_all_docs'):
+                i = doc['id']
+                if i[0:6] == "trans-":
+                    for doc in db.find({
+                            "selector": {
+                            "_id": "{id}".format(id=i)
+                            }}):
+                            query_info = json.dumps(doc, indent=4, sort_keys=True)
+                            query_json = json.loads(query_info)
+                            infoVeiculo = query_json
+                            listaTransacoes.append(infoVeiculo)
+                    
+        return json.dumps(listaTransacoes), 200
+
+    if request.method == 'POST':
+        
+        request_data = request.get_json()
+        
+        loop = asyncio.get_event_loop()
+
+        c_hlf = client_fabric(net_profile=(domain + ".json"))
+
+        admin = c_hlf.get_user(domain, 'Admin')
+        
+        callpeer = "peer0." + domain
+        
+        c_hlf.new_channel(channel_name)
+
+        response = loop.run_until_complete(
+            c_hlf.chaincode_invoke(requestor=admin,
+                                channel_name=channel_name,
+                                peers=[callpeer],                               
+                                args=[request_data["ProprietarioOrdem"], request_data["TipoTransacao"], request_data["SaldoOfertado"]],
+                                cc_name=cc_name,
+                                cc_version=cc_version,
+                                fcn='registrarVeiculo',
+                                cc_pattern=None))
+        
+        return Response(response=json.dumps({
+            "status": 201,
+            "mensagem": "Ordem de transação registrada com sucesso"}), status=201, mimetype='application/json')    
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=8001, host="0.0.0.0")
