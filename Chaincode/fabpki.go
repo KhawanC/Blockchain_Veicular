@@ -258,7 +258,7 @@ func (s *SmartContract) anunciarOrdem(stub shim.ChaincodeStubInterface, args []s
 	ordemVenda := OrdemTransacao{
 		IdComprador:       "null",
 		ValorUltimoLance:  0.0,
-		StatusOrdem:       "recente",
+		StatusOrdem:       "Recente",
 		ProprietarioOrdem: proprietarioOrdem,
 		SaldoOfertado:     saldoOfertaFloat,
 		TipoTransacao:     tipoTransacao,
@@ -307,7 +307,7 @@ func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []stri
 	ordem := OrdemTransacao{}
 	json.Unmarshal(ordemTransacaoAsBytes, &ordem)
 
-	if ordem.StatusOrdem == "fechado" {
+	if ordem.StatusOrdem == "Fechado" {
 		fmt.Println("Essa ordem está fechada")
 		return shim.Error("Essa ordem não pode mais ser movimentado pois o proprietário à fechou.")
 	}
@@ -368,14 +368,18 @@ func (s *SmartContract) fecharOrdem(stub shim.ChaincodeStubInterface, args []str
 		return shim.Error("Você não é o proprietário dessa ordem")
 	}
 
-	//Recuperando
+	//Recuperando dados do proprietario
 	proprietarioAsBytes, err := stub.GetState(ordem.ProprietarioOrdem)
 	if err != nil || ordemTransacaoAsBytes == nil {
 		fmt.Println("Seu proprietario nao existe")
 		return shim.Error("Seu proprietário não existe.")
 	}
 
-	//Recuperando
+	//Encapsulando os dados do fabricante
+	proprietario := Fabricante{}
+	json.Unmarshal(proprietarioAsBytes, &proprietario)
+
+	//Recuperando dados do comprador
 	compradorAsBytes, err := stub.GetState(ordem.IdComprador)
 	if err != nil || ordemTransacaoAsBytes == nil {
 		fmt.Println("Seu comprador nao existe")
@@ -383,33 +387,34 @@ func (s *SmartContract) fecharOrdem(stub shim.ChaincodeStubInterface, args []str
 	}
 
 	//Encapsulando os dados do fabricante
-	proprietario := Fabricante{}
-	json.Unmarshal(proprietarioAsBytes, &proprietario)
-
-	//Encapsulando os dados do fabricante
 	comprador := Fabricante{}
 	json.Unmarshal(compradorAsBytes, &comprador)
 
 	if ordem.IdComprador == "null" {
 		fmt.Println("Nao houveram lances para essa ordem")
-		fmt.Println("Não houveram lances para essa ordem...")
-	} else if ordem.TipoTransacao == "vender" {
+
+		return shim.Error("Não houveram lances para essa ordem")
+	}
+
+	if ordem.TipoTransacao == "vender" {
 		proprietario.SaldoFiduciario += ordem.ValorUltimoLance
 		comprador.SaldoFiduciario -= ordem.ValorUltimoLance
-		ordem.StatusOrdem = "fechado"
-	} else if ordem.TipoTransacao == "comprar" {
+		ordem.StatusOrdem = "Fechado"
+	}
+
+	if ordem.TipoTransacao == "comprar" {
 		proprietario.SaldoCarbono += ordem.ValorUltimoLance
 		comprador.SaldoCarbono -= ordem.ValorUltimoLance
-		ordem.StatusOrdem = "fechado"
+		ordem.StatusOrdem = "Fechado"
 	}
 
 	ordemTransacaoAsBytes, _ = json.Marshal(ordem)
 	proprietarioAsBytes, _ = json.Marshal(proprietario)
 	compradorAsBytes, _ = json.Marshal(comprador)
 
-	stub.PutState(ordemTransacaoAsBytes, idTransacao)
-	stub.PutState(proprietarioAsBytes, idProprietario)
-	stub.PutState(compradorAsBytes, ordem.IdComprador)
+	stub.PutState(idTransacao, ordemTransacaoAsBytes)
+	stub.PutState(idProprietario, proprietarioAsBytes)
+	stub.PutState(ordem.IdComprador, compradorAsBytes)
 
 	fmt.Println("Transação finalizada com sucesso")
 	return shim.Success(nil)
