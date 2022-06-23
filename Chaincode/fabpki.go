@@ -110,11 +110,11 @@ func (s *SmartContract) registrarFabricante(stub shim.ChaincodeStubInterface, ar
 		SaldoFiduciario: 100000.0,
 	}
 
-	fabricanteAsBytes, _ := json.Marshal(fabricanteInfor) //Encapsulando as informações em arquivo JSON
+	fabricanteAsBytes, _ := json.Marshal(fabricanteInfor)
 
 	idCdgLedger := "fab-" + nomeFab
 
-	stub.PutState(idCdgLedger, fabricanteAsBytes) //Inserindo valores no ledger, com uma informação associada à uma chave
+	stub.PutState(idCdgLedger, fabricanteAsBytes)
 
 	fmt.Println("Sucesso ao registrar fabricantes")
 	return shim.Success(nil)
@@ -144,7 +144,24 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 	//Recuperando dados do usuário
 	fabricanteAsBytes, err := stub.GetState(("fab-" + fabNome))
 	if err != nil || fabricanteAsBytes == nil {
-		return shim.Error("Seu fabricante não existe.")
+
+		fabricanteInfor := Fabricante{
+			Co2Tot:          0.0,
+			SaldoCarbono:    0.0,
+			SaldoFiduciario: 100000.0,
+		}
+
+		fabricanteInfor.Co2Tot += co2VeicFloat
+
+		veiculoAsBytes, _ := json.Marshal(userVeiculo)
+		fabricanteAsBytes, _ = json.Marshal(fabricanteInfor)
+
+		stub.PutState(("fab-" + fabNome), fabricanteAsBytes)
+		stub.PutState(("veic-" + vim), veiculoAsBytes)
+
+		fmt.Println("Sucesso ao registrar veiculo e fabricante")
+		return shim.Success(nil)
+
 	}
 
 	//Criando Struct para encapsular os dados do veiculo
@@ -385,6 +402,14 @@ func (s *SmartContract) fecharOrdem(stub shim.ChaincodeStubInterface, args []str
 		comprador.SaldoCarbono -= ordem.ValorUltimoLance
 		ordem.StatusOrdem = "fechado"
 	}
+
+	ordemTransacaoAsBytes, _ = json.Marshal(ordem)
+	proprietarioAsBytes, _ = json.Marshal(proprietario)
+	compradorAsBytes, _ = json.Marshal(comprador)
+
+	stub.PutState(ordemTransacaoAsBytes, idTransacao)
+	stub.PutState(proprietarioAsBytes, idProprietario)
+	stub.PutState(compradorAsBytes, ordem.IdComprador)
 
 	fmt.Println("Transação finalizada com sucesso")
 	return shim.Success(nil)

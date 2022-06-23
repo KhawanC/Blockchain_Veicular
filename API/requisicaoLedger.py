@@ -104,12 +104,13 @@ def Veiculo():
         c_hlf.new_channel(channel_name)
         
         vin = Vin(request_data["Vim"])
+        fabNome = (vin.manufacturer).upper().replace(" ", "")
 
         response = loop.run_until_complete(
             c_hlf.chaincode_invoke(requestor=admin,
                                 channel_name=channel_name,
                                 peers=[callpeer],                               
-                                args=[request_data["Vim"], request_data["Hash"], request_data["Co2"], (vin.manufacturer).upper()],
+                                args=[request_data["Vim"], request_data["Hash"], request_data["Co2"], fabNome],
                                 cc_name=cc_name,
                                 cc_version=cc_version,
                                 fcn='registrarVeiculo',
