@@ -1,3 +1,4 @@
+from crypt import methods
 from hfc.fabric import Client as client_fabric
 from flask import *
 from tornado.platform.asyncio import AnyThreadEventLoopPolicy
