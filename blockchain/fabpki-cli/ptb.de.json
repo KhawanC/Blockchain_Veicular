@@ -55,7 +55,7 @@
   },
   "orderers":{
     "solo.orderer.nmi":{
-      "url":"10.25.103.132:7050",
+      "url":"192.168.0.105:7050",
       "grpcOptions": {
         "grpc.ssl_target_name_override": "solo.orderer.nmi",
         "grpc-max-send-message-length": 15
@@ -73,8 +73,8 @@
   },
   "peers":{
     "peer0.ptb.de":{
-      "url":"10.25.103.132:7051",
-      "eventUrl":"10.25.103.132:7053",
+      "url":"192.168.0.105:7051",
+      "eventUrl":"192.168.0.105:7053",
       "grpcOptions": {
         "grpc.ssl_target_name_override": "peer0.ptb.de",
         "grpc-max-send-message-length": 15

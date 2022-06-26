@@ -312,6 +312,10 @@ func (s *SmartContract) ordemLance(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error("Essa ordem não pode mais ser movimentado pois o proprietário à fechou.")
 	}
 
+	if idComprador == ordem.IdComprador {
+		fmt.Println("Você não pode efetuar um lance duas vezes")
+	}
+
 	fabricante := Fabricante{}
 	json.Unmarshal(fabricanteAsBytes, &fabricante)
 
