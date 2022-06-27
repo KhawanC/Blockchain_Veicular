@@ -11,7 +11,7 @@ export const PaginacaoJs = ({postsPerPage, totalPosts, paginate}) => {
         <Mainbox>
             <ul>
                 {pageNumber.map(num => (
-                    <li key={num} onClick={() => paginate(num)}>
+                    <li key={num} onClick={() => paginate(num)} className='bg-blue-500'>
                         <span onClick={() => paginate(num)}>
                             {num}
                         </span>

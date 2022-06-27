@@ -1,29 +1,32 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'
 import { Navbar } from 'flowbite-react'
+import { LinksBox, LogoBox, Mainbox } from './style';
 
 export const Navvbar = (props) => {
+
+    const navigate = useNavigate();
+
     return(
         <>
-            <Navbar fluid={true} rounded={true} className='bg-blue-500'>
-            <Navbar.Brand href="./painel_administrativo">
-                <img
-                src="https://i.imgur.com/DOGZ4Yd.png"
-                className="mr-5 h-10 sm:h-20"
-                alt="Carro"
-                />
-                <span className="self-center whitespace-nowrap text-4xl font-semibold dark:text-white">
-                Mobicrowd
-                </span>
-            </Navbar.Brand>
-            <div className="flex md:order-2">
-                <Navbar.Toggle />
-            </div>
-            <Navbar.Collapse>
-                <Navbar.Link href="/"><span className='text-2xl text-black hover:text-white'>Inicio</span></Navbar.Link>
-                <Navbar.Link href="/transacao"><span className='text-2xl text-black hover:text-white'>Transação</span></Navbar.Link>
-            </Navbar.Collapse>
-            </Navbar>
-
+            <Mainbox className='bg-blue-800'>
+                <LogoBox>
+                    <img
+                    src="https://i.imgur.com/DOGZ4Yd.png"
+                    className="mr-5 h-10 sm:h-20"
+                    alt="Carro"
+                    />
+                    <span className="self-center whitespace-nowrap text-4xl font-semibold">
+                    Mobicrowd
+                    </span>
+                </LogoBox>
+                <LinksBox>
+                    <ul>
+                        <li><span onClick={() => navigate('/')}>Inicio</span></li>
+                        <li><span onClick={() => navigate('/transacao')}>Transações</span></li>
+                    </ul>
+                </LinksBox>
+            </Mainbox>
         </>
     )
 };

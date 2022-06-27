@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Api } from '../../Services/Api';
-import { PostJs } from '../PostJs';
+import { PostTransJs } from '../PostTransJs';
 import { PaginacaoJs } from '../PaginacaoJS';
 import { Mainbox } from './style';
 
-export const TableVeiculos = (params) => {
+export const TableTransacoes = (params) => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -13,7 +13,7 @@ export const TableVeiculos = (params) => {
     useEffect(() => {
         const fetchPost = async () => {
             setLoading(true);
-            const res = await Api.get('veiculo');
+            const res = await Api.get('ordem');
             console.log(res)
             setPosts(res.data);
             setLoading(false);
@@ -31,7 +31,7 @@ export const TableVeiculos = (params) => {
     return(
         <>
             <Mainbox>
-                <PostJs posts={currentPost} loading={loading}/>
+                <PostTransJs posts={currentPost} loading={loading}/>
                 <PaginacaoJs postsPerPage={postsPerPage} totalPosts={posts.length} paginate={paginate}/>
             </Mainbox>   
         </>

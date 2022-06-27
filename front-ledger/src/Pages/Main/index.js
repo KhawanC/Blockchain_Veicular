@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ResumoVeiculosCard } from '../../Components/ResumoVeiculosCard';
 import { Api } from '../../Services/Api';
 import { TableVeiculos } from '../../Components/TableVeiculos';
-import { CardsResumo } from './style'
+import { CardsResumo, MainBox } from './style'
 
 export const Main = (props) => {
 
@@ -17,11 +17,10 @@ export const Main = (props) => {
       setTimeout(function() {
         atualizarDados()
         setTicker(e => e + 1)
-      }, 100)
+      }, 5000)
     }, [ticker])
 
     const atualizarDados = async () => {
-      try {
         const res = await Api.get(`veiculo`);
         setTotalVeiculos(e => res.data.length)
         const res2 = await Api.get(`fabricante`);
@@ -30,17 +29,19 @@ export const Main = (props) => {
         setTotalTransacoes(e => res3.data.length)
         let acumulador = 0 
         for (let i = 0; i < res2.data.length; i++) {
-          acumulador += res2.data[i].Co2_Tot 
+          if(res2.data[i].Co2_Tot != 0) {
+            acumulador += res2.data[i].Co2_Tot
+          }
+          if(res2.data[i].SaldoCarbono) {
+            acumulador += res2.data[i].SaldoCarbono
+          }
         }
         setTotalCarbono(e => acumulador)
-      } catch (error) {
-        console.log(error)
-      }
     }
 
     return (
         <>  
-          <div className='h-screen bg-blue-800 pt-14'>
+          <MainBox>
             <CardsResumo>
               <ResumoVeiculosCard texto={'Veiculos registrados'} quantidade={totalVeiculos} img={'veic'}/>
               <ResumoVeiculosCard texto={'Fabricantes registrados'} quantidade={totalFabricantes} img={'fab'}/>
@@ -48,7 +49,7 @@ export const Main = (props) => {
               <ResumoVeiculosCard texto={'Transações realizadas'} quantidade={totalTransacoes} img={'trans'}/>
             </CardsResumo>
             <TableVeiculos/> 
-          </div>
+          </MainBox>
                        
         </>
     );

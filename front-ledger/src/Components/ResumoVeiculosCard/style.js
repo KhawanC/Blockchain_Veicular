@@ -1,8 +1,6 @@
 import styled from 'styled-components'
 
 export const Mainbox = styled.div`
-    background-image: linear-gradient(var(--primary-color), var(--secondary-color));
-    
     display: flex;
     flex-direction: column;
 

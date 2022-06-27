@@ -13,8 +13,6 @@ export const Mainbox = styled.nav`
     }
 
     ul li {
-        background-color: #3b51a1;
-
         display: flex;
 
         width: 30px;
