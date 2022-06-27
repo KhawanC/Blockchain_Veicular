@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../../Components/Navbar';
-import ResumoVeiculosCard from '../../Components/ResumoVeiculosCard';
+import { ResumoVeiculosCard } from '../../Components/ResumoVeiculosCard';
 import { Api } from '../../Services/Api';
-import { CardsResumo } from './style';
+import { TableVeiculos } from '../../Components/TableVeiculos';
+import { CardsResumo } from './style'
 
-function Main(props) {
+export const Main = (props) => {
 
     const [ticker, setTicker] = useState(0)
     const [totalVeiculos, setTotalVeiculos] = useState(0)
@@ -39,17 +39,17 @@ function Main(props) {
     }
 
     return (
-        <>
-            <Navbar/>
+        <>  
+          <div className='h-screen bg-blue-800 pt-14'>
             <CardsResumo>
-              <ResumoVeiculosCard texto={'Veiculos registrados'} quantidade={totalVeiculos}/>
-              <ResumoVeiculosCard texto={'Fabricantes registrados'} quantidade={totalFabricantes}/>
-              <ResumoVeiculosCard texto={'Total de carbono emitido'} quantidade={totalCarbono}/>
-              <ResumoVeiculosCard texto={'Transações realizadas'} quantidade={totalTransacoes}/>
+              <ResumoVeiculosCard texto={'Veiculos registrados'} quantidade={totalVeiculos} img={'veic'}/>
+              <ResumoVeiculosCard texto={'Fabricantes registrados'} quantidade={totalFabricantes} img={'fab'}/>
+              <ResumoVeiculosCard texto={'Total de carbono emitido'} quantidade={totalCarbono} img={'carb'}/>
+              <ResumoVeiculosCard texto={'Transações realizadas'} quantidade={totalTransacoes} img={'trans'}/>
             </CardsResumo>
-            
+            <TableVeiculos/> 
+          </div>
+                       
         </>
     );
 }
-
-export default Main;

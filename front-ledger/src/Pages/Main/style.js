@@ -8,6 +8,6 @@ export const CardsResumo = styled.div`
     justify-content: center;
     align-items: center;
 
-    margin: 3em;
     gap: 5em;
+
 `;

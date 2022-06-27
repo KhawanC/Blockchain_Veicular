@@ -1,13 +1,13 @@
 import React from 'react';
-import Main from "./Pages/Main"
+import { Root } from "./Routes/Root"
 import "./global-style.css"
+import { Navvbar } from './Components/Navbar';
 
-function App() {
+export function App() {
   return (
     <div className="App">
-      <Main/>
+      <Navvbar/>
+      <Root/>
     </div>
   );
 }
-
-export default App;
