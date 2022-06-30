@@ -1,9 +1,10 @@
 from hfc.fabric import Client as client_fabric
 from flask import *
+from teste2 import makePlaca
 from tornado.platform.asyncio import AnyThreadEventLoopPolicy
 from vininfo import Vin
-from multiprocessing import Process
-import asyncio, couchdb, json, random, threading
+from concurrent.futures import ThreadPoolExecutor
+import asyncio, couchdb, json, random, multiprocessing
 
 domain = "ptb.de"
 channel_name = "nmi-channel"
@@ -15,7 +16,50 @@ app = Flask(__name__)
 
 asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())  
 
-global queue
+class ThreadingFunction:
+    def ProcessModelo(id, arq_json):
+        loop = asyncio.get_event_loop()
+
+        c_hlf = client_fabric(net_profile=(domain + ".json"))
+
+        admin = c_hlf.get_user(domain, 'Admin')
+        
+        callpeer = "peer0." + domain
+        
+        c_hlf.new_channel(channel_name)
+
+        response = loop.run_until_complete(c_hlf.chaincode_invoke(
+            requestor=admin, 
+            channel_name=channel_name, 
+            peers=[callpeer],
+            cc_name=cc_name, 
+            cc_version=cc_version,
+            fcn='registrarModeloPBE', 
+            args=[id, arq_json[id]["Categoria"], arq_json[id]["Fabricante"].upper(), arq_json[id]["Versao"], arq_json[id]["Modelo"], str(arq_json[id]["Emissao"])], 
+            cc_pattern=None))
+
+    def ProcessPlaca(placa, idModelo):
+
+        loop = asyncio.get_event_loop()
+
+        c_hlf = client_fabric(net_profile=(domain + ".json"))
+
+        admin = c_hlf.get_user(domain, 'Admin')
+        
+        callpeer = "peer0." + domain
+        
+        c_hlf.new_channel(channel_name)
+            
+        response = loop.run_until_complete(
+            c_hlf.chaincode_invoke(requestor=admin,
+                                channel_name=channel_name,
+                                peers=[callpeer],                               
+                                args=[placa, ('model-' + idModelo)],
+                                cc_name=cc_name,
+                                cc_version=cc_version,
+                                fcn='registrarVeiculoPBE',
+                                cc_pattern=None))
+            
 
 @app.route('/modeloPBE', methods=['POST', 'GET'])
 def Modelo():
@@ -27,7 +71,7 @@ def Modelo():
         
         for doc in db.view('_all_docs'):
                 i = doc['id']
-                if i[0:4] == "model-":
+                if i[0:6] == "model-":
                     for doc in db.find({
                             "selector": {
                             "_id": "{id}".format(id=i)
@@ -41,42 +85,15 @@ def Modelo():
 
     if request.method == 'POST':
 
-        def ProcessModelo(id):
-            loop = asyncio.get_event_loop()
-
-            c_hlf = client_fabric(net_profile=(domain + ".json"))
-
-            admin = c_hlf.get_user(domain, 'Admin')
-            
-            callpeer = "peer0." + domain
-            
-            c_hlf.new_channel(channel_name)
-
-            response = loop.run_until_complete(c_hlf.chaincode_invoke(
-                requestor=admin, 
-                channel_name=channel_name, 
-                peers=[callpeer],
-                cc_name=cc_name, 
-                cc_version=cc_version,
-                fcn='registrarModeloPBE', 
-                args=[id, arq_json[id]["Categoria"], arq_json[id]["Fabricante"].upper(), arq_json[id]["Versao"], arq_json[id]["Modelo"], str(arq_json[id]["Emissao"])], 
-                cc_pattern=None))
-
         with open('pbe-veicular.json') as f:
             arq_json = json.load(f)
-        process = []
-        for k in arq_json:
-            proc = Process(target=ProcessModelo, args=(k,))
-            proc.start()
-            process.append(proc)
-        for p in process:
-            p.join
+        
+        pool = multiprocessing.Pool()
+        processes = [pool.apply_async(ThreadingFunction.ProcessModelo, args=(k, arq_json,)) for k in arq_json]
         
         return Response(response=json.dumps({
             "status": 201,
             "mensagem": "Modelos do PBE registrados com sucesso"}), status=201, mimetype='application/json')
-
-        
 
 @app.route('/fabricante', methods=['POST', 'GET'])
 def Fabricante():
@@ -184,137 +201,46 @@ def Veiculo():
             "mensagem": "Veiculo registrado com sucesso"}), status=201, mimetype='application/json')
 
 @app.route('/veiculoPBE', methods=['POST'])
-
-class Queue(object):
- 
-    def __init__(self):
-        self.item = []
-
-    def __str__(self):
-        return "{}".format(self.item)
-
-    def __repr__(self):
-        return "{}".format(self.item)
-
-    def enque(self, item):
-        """
-        Insert the elements in queue
-        :param item: Any
-        :return: Bool
-        """
-        self.item.insert(0, item)
-        return True
-
-    def size(self):
-        """
-        Return the size of queue
-        :return: Int
-        """
-        return len(self.item)
-
-    def dequeue(self):
-        """
-        Return the elements that came first
-        :return: Any
-        """
-        if self.size() == 0:
-            return None
-        else:
-            return self.item.pop()
-
-    def peek(self):
-        """
-        Check the Last elements
-        :return: Any
-        """
-        if self.size() == 0:
-            return None
-        else:
-            return self.item[-1]
-
-    def isEmpty(self):
-        """
-        Check is the queue is empty
-        :return: bool
-        """
-        if self.size() == 0:
-            return True
-        else:
-            return False
- 
-queue = Queue()
-
-def getLetter():
-    letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-    letters = random.choice(letras)
-    queue.enque(letters)
-
-def getNum():
-    nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    num = random.choice(nums)
-    queue.enque(str(num))
-
-def ProcessPlaca(dict):
-
-    thredProc = []
-
-    loop = asyncio.get_event_loop()
-
-    c_hlf = client_fabric(net_profile=(domain + ".json"))
-
-    admin = c_hlf.get_user(domain, 'Admin')
-    
-    callpeer = "peer0." + domain
-    
-    c_hlf.new_channel(channel_name)
-
-    for _ in range(3):
-        t = threading.Thread(target=getLetter)
-        t.start()
-        thredProc.append(t)
-    for _ in range(1):
-        j = threading.Thread(target=getNum)
-        j.start()
-        thredProc.append(t)
-    for _ in range(1):
-        t = threading.Thread(target=getLetter)
-        t.start()
-        thredProc.append(t)
-    for _ in range(2):
-        j = threading.Thread(target=getNum)
-        j.start()
-        thredProc.append(t)
-    for t in thredProc:
-        t.join()
-    placa = str(queue)
-    placaFormatada = placa.replace("'", "").replace("[", "").replace("]", "").replace(",", "").replace(" ", "")[::-1]
-
-    response = loop.run_until_complete(
-        c_hlf.chaincode_invoke(requestor=admin,
-                            channel_name=channel_name,
-                            peers=[callpeer],                               
-                            args=[placaFormatada, ],
-                            cc_name=cc_name,
-                            cc_version=cc_version,
-                            fcn='registrarVeiculoPBE',
-                            cc_pattern=None))
-
 def VeiculoPBE():
-
+    
     if request.method == 'POST':
 
         with open('pbe-veicular.json') as f:
             arq_json = json.load(f)
 
-        process = []
-        for i in range(1000):
-            p = Process(target=ProcessPlaca(arq_json))
-            p.start()
-            process.append(p)
-        for p in process:
-            p.join()
+        listPlacas = []
+        listModelos = []
+
+        def getModelos(modelo):
+            listModelos.append(modelo)
+
+        def getLetter():
+            letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+            letters = random.choice(letras)
+            return letters
+
+        def getNum():
+            nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            num = random.choice(nums)
+            return str(num)
+
+        def makePlaca():
+            placa = getLetter() + getLetter() + getLetter() + getNum() + getLetter() + getNum() + getNum()
+            listPlacas.append(placa)
         
+        exe = ThreadPoolExecutor(max_workers=8)
+        for m in arq_json:
+            t = exe.submit(getModelos(m))
+        for _ in range(100000):
+            t = exe.submit(makePlaca)
+
+        pool = multiprocessing.Pool()
+        processes = [pool.apply_async(ThreadingFunction.ProcessPlaca, args=(p, random.choice(listModelos))) for p in listPlacas]
+        
+        return Response(response=json.dumps({
+            "status": 201,
+            "mensagem": "Saldo dos fabricantes atualizados com suceso"}), status=201, mimetype='application/json')        
 
 @app.route('/saldo', methods=['POST'])
 def Saldo():
@@ -462,9 +388,3 @@ def FecharOrdem():
     
 if __name__ == "__main__":
     app.run(debug=True, port=8001, host="0.0.0.0")
-
-
-
-
-
-
