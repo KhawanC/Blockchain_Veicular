@@ -1,10 +1,9 @@
 from hfc.fabric import Client as client_fabric
 from flask import *
-from teste2 import makePlaca
 from tornado.platform.asyncio import AnyThreadEventLoopPolicy
 from vininfo import Vin
 from concurrent.futures import ThreadPoolExecutor
-import asyncio, couchdb, json, random, multiprocessing
+import asyncio, couchdb, json, random, multiprocessing, os
 
 domain = "ptb.de"
 channel_name = "nmi-channel"
@@ -88,7 +87,7 @@ def Modelo():
         with open('pbe-veicular.json') as f:
             arq_json = json.load(f)
         
-        pool = multiprocessing.Pool()
+        pool = multiprocessing.Pool(processes=os.cpu_count())
         processes = [pool.apply_async(ThreadingFunction.ProcessModelo, args=(k, arq_json,)) for k in arq_json]
         
         return Response(response=json.dumps({
@@ -235,7 +234,7 @@ def VeiculoPBE():
         for _ in range(10000):
             t = exe.submit(makePlaca)
 
-        pool = multiprocessing.Pool()
+        pool = multiprocessing.Pool(processes=os.cpu_count())
         processes = [pool.apply_async(ThreadingFunction.ProcessPlaca, args=(p, random.choice(listModelos))) for p in listPlacas]
         
         return Response(response=json.dumps({
