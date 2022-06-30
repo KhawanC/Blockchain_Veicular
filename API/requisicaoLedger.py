@@ -40,6 +40,16 @@ def Modelo():
     if request.method == 'POST':
 
         def ProcessModelo(dict):
+            loop = asyncio.get_event_loop()
+
+            c_hlf = client_fabric(net_profile=(domain + ".json"))
+
+            admin = c_hlf.get_user(domain, 'Admin')
+            
+            callpeer = "peer0." + domain
+            
+            c_hlf.new_channel(channel_name)
+
             for k in dict:
                 response = loop.run_until_complete(c_hlf.chaincode_invoke(
                     requestor=admin, 
@@ -55,6 +65,7 @@ def Modelo():
             arq_json = json.load(f)
         process = []
         proc = Process(target=ProcessModelo, args=(arq_json,))
+        proc.start()
         for p in process:
             p.join
         
