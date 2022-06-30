@@ -231,7 +231,7 @@ def VeiculoPBE():
         exe = ThreadPoolExecutor(max_workers=8)
         for m in arq_json:
             t = exe.submit(getModelos(m))
-        for _ in range(10000):
+        for _ in range(1000):
             t = exe.submit(makePlaca)
 
         pool = multiprocessing.Pool(processes=os.cpu_count())
