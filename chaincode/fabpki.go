@@ -50,9 +50,26 @@ func Arredondar(n float64) float64 {
 type SmartContract struct {
 }
 
-type Veiculo struct { //"user-"
+type ModeloPBE struct { //"model-"
+	Categoria  string  `json:"Categoria"`
+	Fabricante string  `json:"Fabricante"`
+	Versao     string  `json:"Versao"`
+	Modelo     string  `json:"Modelo"`
+	Emissao    float64 `json:"Emissao"`
+}
+
+type VeiculoPBE struct { //"veic-"
+	IdModelo   string  `json:"IdModelo"`
+	Co2Emitido float64 `json:"Co2Emitido"`
+}
+
+type trajetoPBE struct { //traj-
+	Distancia float64 `json:"Distancia"`
+	idVeiculo string  `json:"idVeiculo"`
+}
+
+type Veiculo struct { //"veic-"
 	Hash       string  `json:"Hash"`
-	VIN        string  `json:"VIN"`
 	Co2Emitido float64 `json:"Co2Emitido"`
 	Fabricante string  `json:"Fabricante"`
 }
@@ -81,8 +98,14 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 
 	if fn == "registrarVeiculo" {
 		return s.registrarVeiculo(stub, args)
+	} else if fn == "registrarVeiculoPBE" {
+		return s.registrarVeiculoPBE(stub, args)
+	} else if fn == "registrarModeloPBE" {
+		return s.registrarModeloPBE(stub, args)
 	} else if fn == "registrarFabricante" {
 		return s.registrarFabricante(stub, args)
+	} else if fn == "registrarTrajetoPBE" {
+		return s.registrarTrajetoPBE(stub, args)
 	} else if fn == "registrarCredito" {
 		return s.registrarCredito(stub, args)
 	} else if fn == "anunciarOrdem" {
@@ -136,7 +159,6 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 	//Criar Struct para manipular as informações do veículo
 	userVeiculo := Veiculo{
 		Hash:       hash,
-		VIN:        vim,
 		Co2Emitido: co2VeicFloat,
 		Fabricante: fabNome,
 	}
@@ -176,7 +198,143 @@ func (s *SmartContract) registrarVeiculo(stub shim.ChaincodeStubInterface, args 
 	stub.PutState(("fab-" + fabNome), fabricanteAsBytes)
 	stub.PutState(("veic-" + vim), veiculoAsBytes)
 
+	fmt.Println("Sucesso ao registrar veiculo e fabricante")
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) registrarVeiculoPBE(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 2 {
+		return shim.Error("Eram esperado 2 argumentos... Tente novamente!")
+	}
+
+	placa := args[0]
+	idModelo := args[1]
+
+	userVeiculo := VeiculoPBE{
+		IdModelo:   idModelo,
+		Co2Emitido: 0,
+	}
+
+	veiculoAsBytes, _ := json.Marshal(userVeiculo)
+	stub.PutState(("veic-" + placa), veiculoAsBytes)
+
 	fmt.Println("Sucesso ao registrar veiculo")
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) registrarModeloPBE(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 6 {
+		return shim.Error("Eram esperado 6 argumentos... Tente novamente!")
+	}
+
+	idModelo := args[0]
+	categoria := args[1]
+	fabricante := args[2]
+	versao := args[3]
+	modelo := args[4]
+	co2Emissao := args[5]
+
+	co2ModelFloat, err := strconv.ParseFloat(co2Emissao, 64)
+
+	fabricanteAsBytes, err := stub.GetState(("fab-" + fabricante))
+	if err != nil || fabricanteAsBytes == nil {
+
+		fabricanteInfor := Fabricante{
+			Co2Tot:          0.0,
+			SaldoCarbono:    0.0,
+			SaldoFiduciario: 100000.0,
+		}
+
+		modeloInfor := ModeloPBE{
+			Categoria:  categoria,
+			Fabricante: fabricante,
+			Versao:     versao,
+			Modelo:     modelo,
+			Emissao:    co2ModelFloat,
+		}
+
+		modeloAsBytes, _ := json.Marshal(modeloInfor)
+		fabricanteAsBytes, _ = json.Marshal(fabricanteInfor)
+
+		stub.PutState(("model-" + idModelo), modeloAsBytes)
+		stub.PutState(("fab-" + fabricante), fabricanteAsBytes)
+
+		fmt.Println("Fabricante e modelo registrados com sucesso")
+		return shim.Success(nil)
+	}
+
+	modeloInfor := ModeloPBE{
+		Categoria:  categoria,
+		Fabricante: fabricante,
+		Versao:     versao,
+		Modelo:     modelo,
+		Emissao:    co2ModelFloat,
+	}
+
+	modeloAsBytes, _ := json.Marshal(modeloInfor)
+
+	stub.PutState(("model-" + idModelo), modeloAsBytes)
+
+	fmt.Println("Modelo registrado com sucesso")
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) registrarTrajetoPBE(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 3 {
+		return shim.Error("Eram esperado 3 argumentos... Tente novamente!")
+	}
+
+	distancia := args[0]
+	idVeiculoPBE := args[1]
+	idTrajeto := "traj-" + Encode(AleatString(10))
+
+	distanciaFloat, err := strconv.ParseFloat(distancia, 64)
+
+	veiculoPBEAsBytes, err := stub.GetState(idVeiculoPBE)
+	if err != nil || veiculoPBEAsBytes == nil {
+		return shim.Error("Não foi possível resgatar a placa do seu veículo")
+	}
+
+	veiculo := VeiculoPBE{}
+	json.Unmarshal(veiculoPBEAsBytes, &veiculo)
+
+	modeloPBEAsBytes, err := stub.GetState(("model-" + veiculo.IdModelo))
+	if err != nil || modeloPBEAsBytes == nil {
+		return shim.Error("Não foi possível resgatar o modelo do seu veículo")
+	}
+
+	modelo := ModeloPBE{}
+	json.Unmarshal(modeloPBEAsBytes, &modelo)
+
+	fabricanteAsBytes, err := stub.GetState(("fab-" + modelo.Fabricante))
+	if err != nil || fabricanteAsBytes == nil {
+		return shim.Error("Não foi possível resgatar o fabricante do seu veículo")
+	}
+
+	fabricante := Fabricante{}
+	json.Unmarshal(fabricanteAsBytes, &fabricante)
+
+	trajeto := trajetoPBE{
+		idVeiculo: idVeiculoPBE,
+		Distancia: distanciaFloat,
+	}
+
+	carbonoEmitido := trajeto.Distancia * modelo.Emissao
+	veiculo.Co2Emitido += carbonoEmitido
+	fabricante.Co2Tot += carbonoEmitido
+
+	veiculoPBEAsBytes, _ = json.Marshal(veiculo)
+	fabricanteAsBytes, _ = json.Marshal(fabricante)
+	trajetoAsBytes, _ := json.Marshal(trajeto)
+
+	stub.PutState(idVeiculoPBE, veiculoPBEAsBytes)
+	stub.PutState(("fab-" + modelo.Fabricante), fabricanteAsBytes)
+	stub.PutState(idTrajeto, trajetoAsBytes)
+
+	fmt.Println("Sucesso ao registrar trajeto e emissão de co2")
 	return shim.Success(nil)
 }
 
