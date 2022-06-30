@@ -2,6 +2,7 @@ from hfc.fabric import Client as client_fabric
 from flask import *
 from tornado.platform.asyncio import AnyThreadEventLoopPolicy
 from vininfo import Vin
+from multiprocessing import Process
 import asyncio, couchdb, json
 
 domain = "ptb.de"
@@ -13,6 +14,55 @@ import couchdb, json
 app = Flask(__name__)
 
 asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())    
+
+@app.route('/modeloPBE', methods=['POST', 'GET'])
+def Modelo():
+    if request.method == 'GET':
+        listaModelos = []
+        server = couchdb.Server('http://localhost:5984/_utils')
+        couch = couchdb.Server()
+        db = couch['nmi-channel_fabpki']
+        
+        for doc in db.view('_all_docs'):
+                i = doc['id']
+                if i[0:4] == "model-":
+                    for doc in db.find({
+                            "selector": {
+                            "_id": "{id}".format(id=i)
+                            }}):
+                            query_info = json.dumps(doc, indent=4, sort_keys=True)
+                            query_json = json.loads(query_info)
+                            infoModelo = query_json
+                            listaModelos.append(infoModelo)
+                    
+        return json.dumps(listaModelos), 200    
+
+    if request.method == 'POST':
+
+        def ProcessModelo(dict):
+            for k in dict:
+                response = loop.run_until_complete(c_hlf.chaincode_invoke(
+                    requestor=admin, 
+                    channel_name=channel_name, 
+                    peers=[callpeer],
+                    cc_name=cc_name, 
+                    cc_version=cc_version,
+                    fcn='registrarModeloPBE', 
+                    args=[k, arq_json[k]["Categoria"], arq_json[k]["Fabricante"].upper(), arq_json[k]["Versao"], arq_json[k]["Modelo"], str(arq_json[k]["Emissao"])], 
+                    cc_pattern=None))
+
+        with open('pbe-veicular.json') as f:
+            arq_json = json.load(f)
+        process = []
+        proc = Process(target=ProcessModelo, args=(arq_json,))
+        for p in process:
+            p.join
+        
+        return Response(response=json.dumps({
+            "status": 201,
+            "mensagem": "Modelos do PBE registrados com sucesso"}), status=201, mimetype='application/json')
+
+        
 
 @app.route('/fabricante', methods=['POST', 'GET'])
 def Fabricante():
