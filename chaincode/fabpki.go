@@ -238,31 +238,8 @@ func (s *SmartContract) registrarModeloPBE(stub shim.ChaincodeStubInterface, arg
 
 	co2ModelFloat, err := strconv.ParseFloat(co2Emissao, 64)
 
-	fabricanteAsBytes, err := stub.GetState(("fab-" + fabricante))
-	if err != nil || fabricanteAsBytes == nil {
-
-		fabricanteInfor := Fabricante{
-			Co2Tot:          0.0,
-			SaldoCarbono:    0.0,
-			SaldoFiduciario: 100000.0,
-		}
-
-		modeloInfor := ModeloPBE{
-			Categoria:  categoria,
-			Fabricante: fabricante,
-			Versao:     versao,
-			Modelo:     modelo,
-			Emissao:    co2ModelFloat,
-		}
-
-		modeloAsBytes, _ := json.Marshal(modeloInfor)
-		fabricanteAsBytes, _ = json.Marshal(fabricanteInfor)
-
-		stub.PutState(("model-" + idModelo), modeloAsBytes)
-		stub.PutState(("fab-" + fabricante), fabricanteAsBytes)
-
-		fmt.Println("Fabricante e modelo registrados com sucesso")
-		return shim.Success(nil)
+	if err != nil {
+		shim.Error("Não foi possível converter a quantidade de co2")
 	}
 
 	modeloInfor := ModeloPBE{

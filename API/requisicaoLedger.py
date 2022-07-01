@@ -37,7 +37,51 @@ class ThreadingFunction:
             args=[id, arq_json[id]["Categoria"], arq_json[id]["Fabricante"].upper(), arq_json[id]["Versao"], arq_json[id]["Modelo"], str(arq_json[id]["Emissao"])], 
             cc_pattern=None))
 
-    def ProcessPlaca(placa, idModelo):
+    def ProcessPlaca():
+        
+        exe = ThreadPoolExecutor(max_workers=5)
+        listPlacas = []
+        listModelos = []
+        listLetras = []
+        listNums = []
+        
+        with open('pbe-veicular.json') as f:
+            arq_json = json.load(f)
+
+        def getModelos(modelo):
+            listModelos.append(modelo)
+
+        def getLetter():
+            letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+            letter = random.choice(letras)
+            listLetras.append(letter)
+            
+
+        def getNum():
+            nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            num = random.choice(nums)
+            listNums.append(num)
+
+        def makePlaca():
+            
+            listLetras = []
+            listNumeros = []
+            
+            for l in range(4):
+                t = exe.submit(getLetter)
+                
+            for n in range(3):
+                t = exe.submit(getNum)
+                
+            placa = listLetras[0] + listLetras[1] + listLetras[2] + listNumeros[0] + listLetras[3] + listNumeros[1] + listNumeros[2]
+            
+            listPlacas.append(placa)
+        
+        for m in arq_json:
+            t = exe.submit(getModelos(m))
+            
+        t = exe.submit(makePlaca)
 
         loop = asyncio.get_event_loop()
 
@@ -53,7 +97,7 @@ class ThreadingFunction:
             c_hlf.chaincode_invoke(requestor=admin,
                                 channel_name=channel_name,
                                 peers=[callpeer],                               
-                                args=[placa, ('model-' + idModelo)],
+                                args=[listPlacas[0], ('model-' + (random.choice(listModelos)))],
                                 cc_name=cc_name,
                                 cc_version=cc_version,
                                 fcn='registrarVeiculoPBE',
@@ -204,38 +248,8 @@ def VeiculoPBE():
     
     if request.method == 'POST':
 
-        with open('pbe-veicular.json') as f:
-            arq_json = json.load(f)
-
-        listPlacas = []
-        listModelos = []
-
-        def getModelos(modelo):
-            listModelos.append(modelo)
-
-        def getLetter():
-            letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-            letters = random.choice(letras)
-            return letters
-
-        def getNum():
-            nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-            num = random.choice(nums)
-            return str(num)
-
-        def makePlaca():
-            placa = getLetter() + getLetter() + getLetter() + getNum() + getLetter() + getNum() + getNum()
-            listPlacas.append(placa)
-        
-        exe = ThreadPoolExecutor(max_workers=8)
-        for m in arq_json:
-            t = exe.submit(getModelos(m))
-        for _ in range(1000):
-            t = exe.submit(makePlaca)
-
         pool = multiprocessing.Pool(processes=os.cpu_count())
-        processes = [pool.apply_async(ThreadingFunction.ProcessPlaca, args=(p, random.choice(listModelos))) for p in listPlacas]
+        processes = [pool.apply_async(ThreadingFunction.ProcessPlaca,) for p in range(1000)]
         
         return Response(response=json.dumps({
             "status": 201,
